@@ -3,13 +3,28 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-_ROOT_ENV = Path(__file__).resolve().parents[3] / ".env"
-_LOCAL_ENV = Path(__file__).resolve().parents[2] / ".env"
+
+def _env_files() -> tuple[str, ...]:
+    """Collect nearby .env paths without assuming monorepo depth (Docker-safe)."""
+    found: list[str] = []
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        candidate = parent / ".env"
+        if candidate.is_file():
+            found.append(str(candidate))
+        # Stop at filesystem root
+        if parent.parent == parent:
+            break
+    # Also allow a process cwd .env (and keep order: nearest first)
+    cwd_env = Path.cwd() / ".env"
+    if cwd_env.is_file() and str(cwd_env) not in found:
+        found.append(str(cwd_env))
+    return tuple(found) if found else (".env",)
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(str(_ROOT_ENV), str(_LOCAL_ENV), ".env"),
+        env_file=_env_files(),
         env_file_encoding="utf-8",
         extra="ignore",
     )
