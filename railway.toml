@@ -1,0 +1,18 @@
+# Railway: create three services from this monorepo (Postgres + API + Web).
+# Set each service's Dockerfile path / watch patterns in the Railway dashboard,
+# or use the settings below when deploying via Railway's monorepo Docker builds.
+#
+# Recommended layout:
+#   1) Postgres plugin (Railway) → provides DATABASE_URL
+#   2) Service "api"  → Dockerfile.api
+#   3) Service "web"  → Dockerfile.web (set NEXT_PUBLIC_API_URL to the public API URL)
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.api"
+
+[deploy]
+healthcheckPath = "/healthz"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5

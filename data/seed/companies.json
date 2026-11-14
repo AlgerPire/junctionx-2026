@@ -1,0 +1,14 @@
+[
+  {"demo_key": "company_demo", "name": "Nordic Health Data Oy", "sector": "health_tech", "size_band": "51-200", "description": "Builds tools that turn clinical documentation into usable care insights."},
+  {"demo_key": null, "name": "Fjord Cloud Labs", "sector": "cloud", "size_band": "11-50", "description": "Helps Finnish SMEs harden cloud workloads."},
+  {"demo_key": null, "name": "Baltic Route Systems", "sector": "logistics", "size_band": "201-500", "description": "Digital logistics coordination for Nordic freight."},
+  {"demo_key": null, "name": "Pixel Harbour", "sector": "web", "size_band": "11-50", "description": "Product studio building accessible public-sector web apps."},
+  {"demo_key": null, "name": "Caretide Support", "sector": "customer_support", "size_band": "51-200", "description": "Customer success and support for SaaS health tools."},
+  {"demo_key": null, "name": "Aurora Ledger", "sector": "finance_ops", "size_band": "11-50", "description": "Finance operations platform for growing companies."},
+  {"demo_key": null, "name": "Silicon Shore Testing", "sector": "hardware", "size_band": "11-50", "description": "Hardware and firmware test lab for IoT devices."},
+  {"demo_key": null, "name": "Lakeview Analytics", "sector": "data", "size_band": "51-200", "description": "Analytics engineering for municipal and mobility data."},
+  {"demo_key": null, "name": "Espoo Softworks", "sector": "web", "size_band": "51-200", "description": "Backend-heavy product teams for civic tech."},
+  {"demo_key": null, "name": "Northline Ops", "sector": "logistics", "size_band": "501+", "description": "Warehouse and last-mile operations across Finland."},
+  {"demo_key": null, "name": "Secure Nest", "sector": "cloud", "size_band": "11-50", "description": "Cloud security consulting and managed detection."},
+  {"demo_key": null, "name": "Helix Care Systems", "sector": "health_tech", "size_band": "201-500", "description": "Hospital workflow and care pathway software."}
+]

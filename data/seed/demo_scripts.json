@@ -1,0 +1,25 @@
+{
+  "company_demo": {
+    "brief": [
+      {
+        "user": "We need someone who understands clinical notes and can help our ward leads trust the dashboards.",
+        "assistant": "What problem should this person solve in the first 90 days?",
+        "done": false
+      },
+      {
+        "user": "Turn messy clinical documentation into a validated weekly insight pack.",
+        "assistant": "Which three skills are must-haves to even start?",
+        "done": false
+      }
+    ]
+  },
+  "seeker_demo_a": {
+    "story": [
+      {
+        "user": "I coordinated care for a 12-bed ward and wrote the daily clinical notes myself.",
+        "assistant": "Tell me about a time you learned something new quickly.",
+        "done": false
+      }
+    ]
+  }
+}

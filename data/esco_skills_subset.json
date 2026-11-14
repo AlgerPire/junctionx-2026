@@ -1,0 +1,1567 @@
+[
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0001",
+    "label": "Python",
+    "labels": {
+      "en": "Python",
+      "fi": "Python",
+      "sv": "Python"
+    },
+    "description": "Write and maintain Python programs",
+    "cluster": "data",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "python programming"
+      },
+      {
+        "lang": "fi",
+        "synonym": "python-ohjelmointi"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0002",
+    "label": "SQL",
+    "labels": {
+      "en": "SQL",
+      "fi": "SQL",
+      "sv": "SQL"
+    },
+    "description": "Query and manage relational data with SQL",
+    "cluster": "data",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "structured query language"
+      },
+      {
+        "lang": "en",
+        "synonym": "relational queries"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0003",
+    "label": "Data analysis",
+    "labels": {
+      "en": "Data analysis",
+      "fi": "Data-analyysi",
+      "sv": "Dataanalys"
+    },
+    "description": "Analyse datasets to find patterns and insights",
+    "cluster": "data",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "analytics"
+      },
+      {
+        "lang": "en",
+        "synonym": "data analytics"
+      },
+      {
+        "lang": "fi",
+        "synonym": "analytiikka"
+      },
+      {
+        "lang": "sv",
+        "synonym": "analys"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0004",
+    "label": "Data visualisation",
+    "labels": {
+      "en": "Data visualisation",
+      "fi": "Datavisualisointi",
+      "sv": "Datavisualisering"
+    },
+    "description": "Create charts and dashboards from data",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0005",
+    "label": "Pandas",
+    "labels": {
+      "en": "Pandas",
+      "fi": "Pandas",
+      "sv": "Pandas"
+    },
+    "description": "Manipulate tabular data with pandas",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0006",
+    "label": "ETL pipelines",
+    "labels": {
+      "en": "ETL pipelines",
+      "fi": "ETL pipelines",
+      "sv": "ETL pipelines"
+    },
+    "description": "Build extract-transform-load data pipelines",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0007",
+    "label": "Statistics",
+    "labels": {
+      "en": "Statistics",
+      "fi": "Statistics",
+      "sv": "Statistics"
+    },
+    "description": "Apply statistical methods to data",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0008",
+    "label": "Machine learning basics",
+    "labels": {
+      "en": "Machine learning basics",
+      "fi": "Koneoppimisen perusteet",
+      "sv": "Grundläggande maskininlärning"
+    },
+    "description": "Train and evaluate simple ML models",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0009",
+    "label": "Health data literacy",
+    "labels": {
+      "en": "Health data literacy",
+      "fi": "Terveysdatan lukutaito",
+      "sv": "Hälsodataförståelse"
+    },
+    "description": "Understand clinical or health-related data concepts",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0010",
+    "label": "Clinical documentation",
+    "labels": {
+      "en": "Clinical documentation",
+      "fi": "Kliininen dokumentointi",
+      "sv": "Klinisk dokumentation"
+    },
+    "description": "Record and interpret clinical notes and workflows",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0011",
+    "label": "Patient care coordination",
+    "labels": {
+      "en": "Patient care coordination",
+      "fi": "Hoidon koordinointi",
+      "sv": "Vårdkoordinering"
+    },
+    "description": "Coordinate care steps across people and systems",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0012",
+    "label": "HL7 / FHIR awareness",
+    "labels": {
+      "en": "HL7 / FHIR awareness",
+      "fi": "HL7 / FHIR awareness",
+      "sv": "HL7 / FHIR awareness"
+    },
+    "description": "Understand healthcare interoperability standards",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0013",
+    "label": "Medical terminology",
+    "labels": {
+      "en": "Medical terminology",
+      "fi": "Lääketieteellinen terminologia",
+      "sv": "Medicinsk terminologi"
+    },
+    "description": "Use and interpret medical terms accurately",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0014",
+    "label": "Quality assurance in healthcare",
+    "labels": {
+      "en": "Quality assurance in healthcare",
+      "fi": "Quality assurance in healthcare",
+      "sv": "Quality assurance in healthcare"
+    },
+    "description": "Check health processes for quality and safety",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0015",
+    "label": "JavaScript",
+    "labels": {
+      "en": "JavaScript",
+      "fi": "JavaScript",
+      "sv": "JavaScript"
+    },
+    "description": "Write client or server JavaScript",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0016",
+    "label": "TypeScript",
+    "labels": {
+      "en": "TypeScript",
+      "fi": "TypeScript",
+      "sv": "TypeScript"
+    },
+    "description": "Write typed JavaScript with TypeScript",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0017",
+    "label": "React",
+    "labels": {
+      "en": "React",
+      "fi": "React",
+      "sv": "React"
+    },
+    "description": "Build user interfaces with React",
+    "cluster": "web",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "React.js"
+      },
+      {
+        "lang": "en",
+        "synonym": "ReactJS"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0018",
+    "label": "HTML and CSS",
+    "labels": {
+      "en": "HTML and CSS",
+      "fi": "HTML ja CSS",
+      "sv": "HTML och CSS"
+    },
+    "description": "Structure and style web pages",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0019",
+    "label": "REST APIs",
+    "labels": {
+      "en": "REST APIs",
+      "fi": "REST-rajapinnat",
+      "sv": "REST-API:er"
+    },
+    "description": "Design or consume HTTP REST APIs",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0020",
+    "label": "Node.js",
+    "labels": {
+      "en": "Node.js",
+      "fi": "Node.js",
+      "sv": "Node.js"
+    },
+    "description": "Build server-side applications with Node.js",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0021",
+    "label": "Next.js",
+    "labels": {
+      "en": "Next.js",
+      "fi": "Next.js",
+      "sv": "Next.js"
+    },
+    "description": "Build full-stack web apps with Next.js",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0022",
+    "label": "Backend development",
+    "labels": {
+      "en": "Backend development",
+      "fi": "Backend-kehitys",
+      "sv": "Backend-utveckling"
+    },
+    "description": "Build server logic, APIs and persistence",
+    "cluster": "web",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "server-side development"
+      },
+      {
+        "lang": "fi",
+        "synonym": "palvelinpuolen kehitys"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0023",
+    "label": "Frontend development",
+    "labels": {
+      "en": "Frontend development",
+      "fi": "Frontend-kehitys",
+      "sv": "Frontend-utveckling"
+    },
+    "description": "Build interactive browser interfaces",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0024",
+    "label": "API design",
+    "labels": {
+      "en": "API design",
+      "fi": "API design",
+      "sv": "API design"
+    },
+    "description": "Design clear and stable API contracts",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0025",
+    "label": "Cloud security",
+    "labels": {
+      "en": "Cloud security",
+      "fi": "Pilviturvallisuus",
+      "sv": "Molnsäkerhet"
+    },
+    "description": "Secure cloud resources and identities",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0026",
+    "label": "AWS basics",
+    "labels": {
+      "en": "AWS basics",
+      "fi": "AWS basics",
+      "sv": "AWS basics"
+    },
+    "description": "Use core Amazon Web Services services",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0027",
+    "label": "Azure basics",
+    "labels": {
+      "en": "Azure basics",
+      "fi": "Azure basics",
+      "sv": "Azure basics"
+    },
+    "description": "Use core Microsoft Azure services",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0028",
+    "label": "Kubernetes",
+    "labels": {
+      "en": "Kubernetes",
+      "fi": "Kubernetes",
+      "sv": "Kubernetes"
+    },
+    "description": "Deploy and operate workloads on Kubernetes",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0029",
+    "label": "Docker",
+    "labels": {
+      "en": "Docker",
+      "fi": "Docker",
+      "sv": "Docker"
+    },
+    "description": "Containerise applications with Docker",
+    "cluster": "cloud",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "containers"
+      },
+      {
+        "lang": "en",
+        "synonym": "containerisation"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0030",
+    "label": "Infrastructure as code",
+    "labels": {
+      "en": "Infrastructure as code",
+      "fi": "Infrastructure as code",
+      "sv": "Infrastructure as code"
+    },
+    "description": "Define infrastructure with code tools",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0031",
+    "label": "CI/CD",
+    "labels": {
+      "en": "CI/CD",
+      "fi": "CI/CD",
+      "sv": "CI/CD"
+    },
+    "description": "Build continuous integration and delivery pipelines",
+    "cluster": "cloud",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "continuous integration"
+      },
+      {
+        "lang": "en",
+        "synonym": "continuous delivery"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0032",
+    "label": "Linux administration",
+    "labels": {
+      "en": "Linux administration",
+      "fi": "Linux administration",
+      "sv": "Linux administration"
+    },
+    "description": "Administer Linux servers and shells",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0033",
+    "label": "Observability",
+    "labels": {
+      "en": "Observability",
+      "fi": "Observability",
+      "sv": "Observability"
+    },
+    "description": "Monitor systems with logs, metrics and traces",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0034",
+    "label": "Identity and access management",
+    "labels": {
+      "en": "Identity and access management",
+      "fi": "Identiteetin- ja pääsynhallinta",
+      "sv": "Identitets- och åtkomsthantering"
+    },
+    "description": "Manage authentication and authorisation",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0035",
+    "label": "Customer support",
+    "labels": {
+      "en": "Customer support",
+      "fi": "Asiakastuki",
+      "sv": "Kundsupport"
+    },
+    "description": "Help customers resolve issues empathetically",
+    "cluster": "customer_support",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "helpdesk"
+      },
+      {
+        "lang": "en",
+        "synonym": "customer service"
+      },
+      {
+        "lang": "fi",
+        "synonym": "asiakaspalvelu"
+      },
+      {
+        "lang": "sv",
+        "synonym": "kundtjänst"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0036",
+    "label": "Ticket triage",
+    "labels": {
+      "en": "Ticket triage",
+      "fi": "Tikettien priorisointi",
+      "sv": "Ärendeprioritering"
+    },
+    "description": "Prioritise and route support tickets",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0037",
+    "label": "Customer success",
+    "labels": {
+      "en": "Customer success",
+      "fi": "Asiakkuuksien hallinta",
+      "sv": "Customer success"
+    },
+    "description": "Help customers adopt and get value from a product",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0038",
+    "label": "Conflict de-escalation",
+    "labels": {
+      "en": "Conflict de-escalation",
+      "fi": "Conflict de-escalation",
+      "sv": "Conflict de-escalation"
+    },
+    "description": "Calm tense customer or team situations",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0039",
+    "label": "CRM tools",
+    "labels": {
+      "en": "CRM tools",
+      "fi": "CRM tools",
+      "sv": "CRM tools"
+    },
+    "description": "Use customer relationship management software",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0040",
+    "label": "Knowledge base writing",
+    "labels": {
+      "en": "Knowledge base writing",
+      "fi": "Knowledge base writing",
+      "sv": "Knowledge base writing"
+    },
+    "description": "Write clear help articles and FAQs",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0041",
+    "label": "Teaching and facilitation",
+    "labels": {
+      "en": "Teaching and facilitation",
+      "fi": "Opetus ja fasilitointi",
+      "sv": "Undervisning och facilitering"
+    },
+    "description": "Explain concepts and facilitate learning",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0042",
+    "label": "Stakeholder communication",
+    "labels": {
+      "en": "Stakeholder communication",
+      "fi": "Stakeholder communication",
+      "sv": "Stakeholder communication"
+    },
+    "description": "Communicate clearly with stakeholders",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0043",
+    "label": "Logistics coordination",
+    "labels": {
+      "en": "Logistics coordination",
+      "fi": "Logistiikan koordinointi",
+      "sv": "Logistikkoordinering"
+    },
+    "description": "Coordinate movement of goods or resources",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0044",
+    "label": "Inventory management",
+    "labels": {
+      "en": "Inventory management",
+      "fi": "Varastonhallinta",
+      "sv": "Lagerhantering"
+    },
+    "description": "Track and optimise stock levels",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0045",
+    "label": "Operations planning",
+    "labels": {
+      "en": "Operations planning",
+      "fi": "Operations planning",
+      "sv": "Operations planning"
+    },
+    "description": "Plan day-to-day operational work",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0046",
+    "label": "Process improvement",
+    "labels": {
+      "en": "Process improvement",
+      "fi": "Process improvement",
+      "sv": "Process improvement"
+    },
+    "description": "Improve workflows for efficiency and quality",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0047",
+    "label": "Supply chain basics",
+    "labels": {
+      "en": "Supply chain basics",
+      "fi": "Supply chain basics",
+      "sv": "Supply chain basics"
+    },
+    "description": "Understand end-to-end supply chain flows",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0048",
+    "label": "Shift scheduling",
+    "labels": {
+      "en": "Shift scheduling",
+      "fi": "Shift scheduling",
+      "sv": "Shift scheduling"
+    },
+    "description": "Plan staff or resource schedules",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0049",
+    "label": "Warehouse systems",
+    "labels": {
+      "en": "Warehouse systems",
+      "fi": "Warehouse systems",
+      "sv": "Warehouse systems"
+    },
+    "description": "Use warehouse management systems",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0050",
+    "label": "Embedded C",
+    "labels": {
+      "en": "Embedded C",
+      "fi": "Embedded C",
+      "sv": "Embedded C"
+    },
+    "description": "Write C for embedded or constrained devices",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0051",
+    "label": "Hardware testing",
+    "labels": {
+      "en": "Hardware testing",
+      "fi": "Hardware testing",
+      "sv": "Hardware testing"
+    },
+    "description": "Test physical devices and report defects",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0052",
+    "label": "Electronics basics",
+    "labels": {
+      "en": "Electronics basics",
+      "fi": "Electronics basics",
+      "sv": "Electronics basics"
+    },
+    "description": "Understand basic electronic circuits",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0053",
+    "label": "Firmware debugging",
+    "labels": {
+      "en": "Firmware debugging",
+      "fi": "Firmware debugging",
+      "sv": "Firmware debugging"
+    },
+    "description": "Debug firmware on devices",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0054",
+    "label": "Test automation",
+    "labels": {
+      "en": "Test automation",
+      "fi": "Test automation",
+      "sv": "Test automation"
+    },
+    "description": "Automate software or hardware tests",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0055",
+    "label": "Oscilloscope use",
+    "labels": {
+      "en": "Oscilloscope use",
+      "fi": "Oscilloscope use",
+      "sv": "Oscilloscope use"
+    },
+    "description": "Measure signals with an oscilloscope",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0056",
+    "label": "Bookkeeping",
+    "labels": {
+      "en": "Bookkeeping",
+      "fi": "Kirjanpito",
+      "sv": "Bokföring"
+    },
+    "description": "Record financial transactions accurately",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0057",
+    "label": "Financial reporting",
+    "labels": {
+      "en": "Financial reporting",
+      "fi": "Financial reporting",
+      "sv": "Financial reporting"
+    },
+    "description": "Prepare clear financial reports",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0058",
+    "label": "Spreadsheet modelling",
+    "labels": {
+      "en": "Spreadsheet modelling",
+      "fi": "Spreadsheet modelling",
+      "sv": "Spreadsheet modelling"
+    },
+    "description": "Build models and analyses in spreadsheets",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0059",
+    "label": "Accounts payable",
+    "labels": {
+      "en": "Accounts payable",
+      "fi": "Accounts payable",
+      "sv": "Accounts payable"
+    },
+    "description": "Process supplier invoices and payments",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0060",
+    "label": "Accounts receivable",
+    "labels": {
+      "en": "Accounts receivable",
+      "fi": "Accounts receivable",
+      "sv": "Accounts receivable"
+    },
+    "description": "Track customer invoices and collections",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0061",
+    "label": "Compliance documentation",
+    "labels": {
+      "en": "Compliance documentation",
+      "fi": "Compliance documentation",
+      "sv": "Compliance documentation"
+    },
+    "description": "Document processes for compliance reviews",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0062",
+    "label": "Problem solving",
+    "labels": {
+      "en": "Problem solving",
+      "fi": "Ongelmanratkaisu",
+      "sv": "Problemlösning"
+    },
+    "description": "Break down problems and find workable solutions",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0063",
+    "label": "Written communication",
+    "labels": {
+      "en": "Written communication",
+      "fi": "Kirjallinen viestintä",
+      "sv": "Skriftlig kommunikation"
+    },
+    "description": "Write clear professional text",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0064",
+    "label": "Verbal communication",
+    "labels": {
+      "en": "Verbal communication",
+      "fi": "Suullinen viestintä",
+      "sv": "Muntlig kommunikation"
+    },
+    "description": "Explain ideas clearly in conversation",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0065",
+    "label": "Teamwork",
+    "labels": {
+      "en": "Teamwork",
+      "fi": "Tiimityö",
+      "sv": "Teamarbete"
+    },
+    "description": "Collaborate effectively with others",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0066",
+    "label": "Self-directed learning",
+    "labels": {
+      "en": "Self-directed learning",
+      "fi": "Self-directed learning",
+      "sv": "Self-directed learning"
+    },
+    "description": "Learn new skills independently and quickly",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0067",
+    "label": "Time management",
+    "labels": {
+      "en": "Time management",
+      "fi": "Time management",
+      "sv": "Time management"
+    },
+    "description": "Plan and prioritise work under constraints",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0068",
+    "label": "Attention to detail",
+    "labels": {
+      "en": "Attention to detail",
+      "fi": "Attention to detail",
+      "sv": "Attention to detail"
+    },
+    "description": "Catch errors and inconsistencies carefully",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0069",
+    "label": "Empathy",
+    "labels": {
+      "en": "Empathy",
+      "fi": "Empathy",
+      "sv": "Empathy"
+    },
+    "description": "Understand and respond to others' needs",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0070",
+    "label": "Adaptability",
+    "labels": {
+      "en": "Adaptability",
+      "fi": "Adaptability",
+      "sv": "Adaptability"
+    },
+    "description": "Adjust approach when conditions change",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0071",
+    "label": "Documentation",
+    "labels": {
+      "en": "Documentation",
+      "fi": "Documentation",
+      "sv": "Documentation"
+    },
+    "description": "Document processes, decisions and systems",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0072",
+    "label": "Mentoring",
+    "labels": {
+      "en": "Mentoring",
+      "fi": "Mentoring",
+      "sv": "Mentoring"
+    },
+    "description": "Help others develop skills",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0073",
+    "label": "Critical thinking",
+    "labels": {
+      "en": "Critical thinking",
+      "fi": "Critical thinking",
+      "sv": "Critical thinking"
+    },
+    "description": "Evaluate claims and evidence carefully",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0074",
+    "label": "Negotiation",
+    "labels": {
+      "en": "Negotiation",
+      "fi": "Negotiation",
+      "sv": "Negotiation"
+    },
+    "description": "Reach agreements across differing interests",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0075",
+    "label": "Project coordination",
+    "labels": {
+      "en": "Project coordination",
+      "fi": "Projektikoordinointi",
+      "sv": "Projektkoordinering"
+    },
+    "description": "Coordinate tasks, people and deadlines",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0076",
+    "label": "Requirements gathering",
+    "labels": {
+      "en": "Requirements gathering",
+      "fi": "Requirements gathering",
+      "sv": "Requirements gathering"
+    },
+    "description": "Elicit and clarify what users need",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0077",
+    "label": "User research basics",
+    "labels": {
+      "en": "User research basics",
+      "fi": "User research basics",
+      "sv": "User research basics"
+    },
+    "description": "Learn from users through interviews or tests",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0078",
+    "label": "Accessibility awareness",
+    "labels": {
+      "en": "Accessibility awareness",
+      "fi": "Saavutettavuustietoisuus",
+      "sv": "Tillgänglighetsmedvetenhet"
+    },
+    "description": "Consider accessibility in products and services",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0079",
+    "label": "Privacy awareness",
+    "labels": {
+      "en": "Privacy awareness",
+      "fi": "Tietosuojatietoisuus",
+      "sv": "Integritetsmedvetenhet"
+    },
+    "description": "Handle personal data with care",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0080",
+    "label": "GDPR basics",
+    "labels": {
+      "en": "GDPR basics",
+      "fi": "GDPR:n perusteet",
+      "sv": "GDPR-grunder"
+    },
+    "description": "Apply core GDPR principles in practice",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0081",
+    "label": "Git version control",
+    "labels": {
+      "en": "Git version control",
+      "fi": "Git-versionhallinta",
+      "sv": "Git-versionshantering"
+    },
+    "description": "Track code changes with Git",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0082",
+    "label": "PostgreSQL",
+    "labels": {
+      "en": "PostgreSQL",
+      "fi": "PostgreSQL",
+      "sv": "PostgreSQL"
+    },
+    "description": "Work with PostgreSQL databases",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0083",
+    "label": "Data cleaning",
+    "labels": {
+      "en": "Data cleaning",
+      "fi": "Data cleaning",
+      "sv": "Data cleaning"
+    },
+    "description": "Clean and validate messy datasets",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0084",
+    "label": "Dashboarding",
+    "labels": {
+      "en": "Dashboarding",
+      "fi": "Dashboarding",
+      "sv": "Dashboarding"
+    },
+    "description": "Build operational dashboards",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0085",
+    "label": "Nursing practice",
+    "labels": {
+      "en": "Nursing practice",
+      "fi": "Hoitotyö",
+      "sv": "Omvårdnad"
+    },
+    "description": "Apply clinical nursing knowledge and care routines",
+    "cluster": "health_tech",
+    "synonyms": [
+      {
+        "lang": "en",
+        "synonym": "nursing"
+      },
+      {
+        "lang": "fi",
+        "synonym": "sairaanhoito"
+      },
+      {
+        "lang": "sv",
+        "synonym": "sjuksköterska"
+      }
+    ]
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0086",
+    "label": "Hospital workflows",
+    "labels": {
+      "en": "Hospital workflows",
+      "fi": "Sairaalan työnkulut",
+      "sv": "Sjukhusarbetsflöden"
+    },
+    "description": "Navigate and improve hospital operational workflows",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0087",
+    "label": "Care pathway mapping",
+    "labels": {
+      "en": "Care pathway mapping",
+      "fi": "Care pathway mapping",
+      "sv": "Care pathway mapping"
+    },
+    "description": "Map patient journeys across care steps",
+    "cluster": "health_tech",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0088",
+    "label": "FastAPI",
+    "labels": {
+      "en": "FastAPI",
+      "fi": "FastAPI",
+      "sv": "FastAPI"
+    },
+    "description": "Build APIs with FastAPI",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0089",
+    "label": "Django",
+    "labels": {
+      "en": "Django",
+      "fi": "Django",
+      "sv": "Django"
+    },
+    "description": "Build web applications with Django",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0090",
+    "label": "Go programming",
+    "labels": {
+      "en": "Go programming",
+      "fi": "Go programming",
+      "sv": "Go programming"
+    },
+    "description": "Write services in Go",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0091",
+    "label": "Java",
+    "labels": {
+      "en": "Java",
+      "fi": "Java",
+      "sv": "Java"
+    },
+    "description": "Write applications in Java",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0092",
+    "label": "System design basics",
+    "labels": {
+      "en": "System design basics",
+      "fi": "System design basics",
+      "sv": "System design basics"
+    },
+    "description": "Design simple distributed systems",
+    "cluster": "web",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0093",
+    "label": "Network security basics",
+    "labels": {
+      "en": "Network security basics",
+      "fi": "Network security basics",
+      "sv": "Network security basics"
+    },
+    "description": "Apply basic network security practices",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0094",
+    "label": "Secrets management",
+    "labels": {
+      "en": "Secrets management",
+      "fi": "Secrets management",
+      "sv": "Secrets management"
+    },
+    "description": "Store and rotate credentials safely",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0095",
+    "label": "Incident response basics",
+    "labels": {
+      "en": "Incident response basics",
+      "fi": "Incident response basics",
+      "sv": "Incident response basics"
+    },
+    "description": "Respond to operational or security incidents",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0096",
+    "label": "Terraform",
+    "labels": {
+      "en": "Terraform",
+      "fi": "Terraform",
+      "sv": "Terraform"
+    },
+    "description": "Manage infrastructure with Terraform",
+    "cluster": "cloud",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0097",
+    "label": "Hospitality operations",
+    "labels": {
+      "en": "Hospitality operations",
+      "fi": "Hospitality operations",
+      "sv": "Hospitality operations"
+    },
+    "description": "Run guest-facing service operations",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0098",
+    "label": "Service recovery",
+    "labels": {
+      "en": "Service recovery",
+      "fi": "Service recovery",
+      "sv": "Service recovery"
+    },
+    "description": "Fix failed service experiences for customers",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0099",
+    "label": "Onboarding facilitation",
+    "labels": {
+      "en": "Onboarding facilitation",
+      "fi": "Onboarding facilitation",
+      "sv": "Onboarding facilitation"
+    },
+    "description": "Guide new users or staff through onboarding",
+    "cluster": "customer_support",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0100",
+    "label": "Route optimisation",
+    "labels": {
+      "en": "Route optimisation",
+      "fi": "Route optimisation",
+      "sv": "Route optimisation"
+    },
+    "description": "Plan efficient routes for deliveries or visits",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0101",
+    "label": "KPI tracking",
+    "labels": {
+      "en": "KPI tracking",
+      "fi": "KPI tracking",
+      "sv": "KPI tracking"
+    },
+    "description": "Define and track operational KPIs",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0102",
+    "label": "Vendor management",
+    "labels": {
+      "en": "Vendor management",
+      "fi": "Vendor management",
+      "sv": "Vendor management"
+    },
+    "description": "Coordinate with external vendors",
+    "cluster": "logistics",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0103",
+    "label": "PCB basics",
+    "labels": {
+      "en": "PCB basics",
+      "fi": "PCB basics",
+      "sv": "PCB basics"
+    },
+    "description": "Understand printed circuit board layouts",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0104",
+    "label": "Sensor integration",
+    "labels": {
+      "en": "Sensor integration",
+      "fi": "Sensor integration",
+      "sv": "Sensor integration"
+    },
+    "description": "Connect and read sensors in devices",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0105",
+    "label": "Regression testing",
+    "labels": {
+      "en": "Regression testing",
+      "fi": "Regression testing",
+      "sv": "Regression testing"
+    },
+    "description": "Re-test systems after changes",
+    "cluster": "hardware",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0106",
+    "label": "Invoice reconciliation",
+    "labels": {
+      "en": "Invoice reconciliation",
+      "fi": "Invoice reconciliation",
+      "sv": "Invoice reconciliation"
+    },
+    "description": "Match invoices to payments and records",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0107",
+    "label": "Budget tracking",
+    "labels": {
+      "en": "Budget tracking",
+      "fi": "Budget tracking",
+      "sv": "Budget tracking"
+    },
+    "description": "Track spend against budgets",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0108",
+    "label": "Audit support",
+    "labels": {
+      "en": "Audit support",
+      "fi": "Audit support",
+      "sv": "Audit support"
+    },
+    "description": "Prepare materials for audits",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0109",
+    "label": "Excel / Sheets advanced",
+    "labels": {
+      "en": "Excel / Sheets advanced",
+      "fi": "Excel / Sheets advanced",
+      "sv": "Excel / Sheets advanced"
+    },
+    "description": "Use advanced spreadsheet formulas and pivots",
+    "cluster": "finance_ops",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0110",
+    "label": "Finnish language (work)",
+    "labels": {
+      "en": "Finnish language (work)",
+      "fi": "Suomen kieli (työ)",
+      "sv": "Finska (arbete)"
+    },
+    "description": "Work in Finnish at professional level",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0111",
+    "label": "Swedish language (work)",
+    "labels": {
+      "en": "Swedish language (work)",
+      "fi": "Ruotsin kieli (työ)",
+      "sv": "Svenska (arbete)"
+    },
+    "description": "Work in Swedish at professional level",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0112",
+    "label": "English language (work)",
+    "labels": {
+      "en": "English language (work)",
+      "fi": "English language (work)",
+      "sv": "English language (work)"
+    },
+    "description": "Work in English at professional level",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0113",
+    "label": "Cross-cultural collaboration",
+    "labels": {
+      "en": "Cross-cultural collaboration",
+      "fi": "Cross-cultural collaboration",
+      "sv": "Cross-cultural collaboration"
+    },
+    "description": "Work effectively across cultural contexts",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0114",
+    "label": "Workshop facilitation",
+    "labels": {
+      "en": "Workshop facilitation",
+      "fi": "Workshop facilitation",
+      "sv": "Workshop facilitation"
+    },
+    "description": "Run productive workshops",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0115",
+    "label": "Public speaking",
+    "labels": {
+      "en": "Public speaking",
+      "fi": "Public speaking",
+      "sv": "Public speaking"
+    },
+    "description": "Present clearly to groups",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0116",
+    "label": "Coaching",
+    "labels": {
+      "en": "Coaching",
+      "fi": "Coaching",
+      "sv": "Coaching"
+    },
+    "description": "Help others improve through coaching conversations",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0117",
+    "label": "Change management basics",
+    "labels": {
+      "en": "Change management basics",
+      "fi": "Change management basics",
+      "sv": "Change management basics"
+    },
+    "description": "Support people through organisational change",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0118",
+    "label": "Risk assessment",
+    "labels": {
+      "en": "Risk assessment",
+      "fi": "Risk assessment",
+      "sv": "Risk assessment"
+    },
+    "description": "Identify and evaluate risks",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0119",
+    "label": "Data ethics awareness",
+    "labels": {
+      "en": "Data ethics awareness",
+      "fi": "Data ethics awareness",
+      "sv": "Data ethics awareness"
+    },
+    "description": "Consider ethical implications of data use",
+    "cluster": "transversal",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0120",
+    "label": "R programming",
+    "labels": {
+      "en": "R programming",
+      "fi": "R programming",
+      "sv": "R programming"
+    },
+    "description": "Analyse data with R",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0121",
+    "label": "Power BI",
+    "labels": {
+      "en": "Power BI",
+      "fi": "Power BI",
+      "sv": "Power BI"
+    },
+    "description": "Build reports in Power BI",
+    "cluster": "data",
+    "synonyms": []
+  },
+  {
+    "esco_uri": "https://data.europa.eu/esco/skill/local-0122",
+    "label": "Spark basics",
+    "labels": {
+      "en": "Spark basics",
+      "fi": "Spark basics",
+      "sv": "Spark basics"
+    },
+    "description": "Process larger datasets with Spark concepts",
+    "cluster": "data",
+    "synonyms": []
+  }
+]

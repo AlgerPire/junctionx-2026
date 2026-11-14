@@ -1,0 +1,106 @@
+[
+  {
+    "demo_key": "seeker_demo_a",
+    "alias": "Seeker #A12",
+    "display_name": "Aino Korhonen",
+    "languages": [{"lang": "fi", "level": "C1"}, {"lang": "en", "level": "B2"}],
+    "needs_relocation": false,
+    "career_path_label": "Nurse to health-data analyst",
+    "synthetic_nationality": "FI",
+    "synthetic_university": "Metropolia UAS",
+    "approved": true,
+    "hidden_gem": true,
+    "skills": [
+      {"label": "Nursing practice", "evidence_quote": "I coordinated care for a 12-bed ward and wrote the daily clinical notes myself."},
+      {"label": "Clinical documentation", "evidence_quote": "I coordinated care for a 12-bed ward and wrote the daily clinical notes myself."},
+      {"label": "Health data literacy", "evidence_quote": "I built a simple spreadsheet that tracked delayed discharges and showed patterns to the charge nurse."},
+      {"label": "Data analysis", "evidence_quote": "I built a simple spreadsheet that tracked delayed discharges and showed patterns to the charge nurse."},
+      {"label": "Python", "evidence_quote": "I taught myself intermediate Python to clean those discharge spreadsheets automatically."},
+      {"label": "Hospital workflows", "evidence_quote": "I mapped the evening handover steps after we kept losing information between shifts."},
+      {"label": "Care pathway mapping", "evidence_quote": "I mapped the evening handover steps after we kept losing information between shifts."},
+      {"label": "Self-directed learning", "evidence_quote": "I taught myself intermediate Python to clean those discharge spreadsheets automatically."}
+    ]
+  },
+  {
+    "demo_key": "seeker_demo_b",
+    "alias": "Seeker #B07",
+    "display_name": "Samir Hassan",
+    "languages": [{"lang": "en", "level": "C1"}, {"lang": "ar", "level": "C2"}],
+    "needs_relocation": true,
+    "career_path_label": "International backend developer",
+    "synthetic_nationality": "EG",
+    "synthetic_university": "Cairo University",
+    "approved": true,
+    "hidden_gem": true,
+    "skills": [
+      {"label": "Backend development", "evidence_quote": "I built and maintained REST services that handled booking traffic for a regional marketplace."},
+      {"label": "REST APIs", "evidence_quote": "I built and maintained REST services that handled booking traffic for a regional marketplace."},
+      {"label": "PostgreSQL", "evidence_quote": "I redesigned slow PostgreSQL queries and cut p95 latency on the checkout endpoint."},
+      {"label": "Docker", "evidence_quote": "I containerised our APIs with Docker so new environments matched production."},
+      {"label": "Git version control", "evidence_quote": "I introduced a branching workflow with code review using Git."},
+      {"label": "System design basics", "evidence_quote": "I proposed a simple cache-and-queue design when flash sales overloaded the monolith."},
+      {"label": "Written communication", "evidence_quote": "I wrote the onboarding guide that new backend hires still use."}
+    ]
+  },
+  {
+    "demo_key": null,
+    "alias": "Seeker #C03",
+    "display_name": "Marta Lindqvist",
+    "languages": [{"lang": "sv", "level": "C1"}, {"lang": "en", "level": "B2"}, {"lang": "fi", "level": "B1"}],
+    "needs_relocation": false,
+    "career_path_label": "Teacher to customer success",
+    "synthetic_nationality": "FI",
+    "synthetic_university": "University of Helsinki",
+    "approved": true,
+    "hidden_gem": true,
+    "skills": [
+      {"label": "Teaching and facilitation", "evidence_quote": "I taught adult learners and redesigned a 6-week course when half the class fell behind."},
+      {"label": "Onboarding facilitation", "evidence_quote": "I created a checklist that helped new teachers start their first week without confusion."},
+      {"label": "Customer success", "evidence_quote": "I ran weekly check-ins that helped parents adopt the school's digital homework tool."},
+      {"label": "Empathy", "evidence_quote": "I ran weekly check-ins that helped parents adopt the school's digital homework tool."},
+      {"label": "Stakeholder communication", "evidence_quote": "I translated technical tool changes into plain language for parents and staff."},
+      {"label": "Knowledge base writing", "evidence_quote": "I wrote short how-to articles so people could self-serve common questions."}
+    ]
+  },
+  {
+    "demo_key": null,
+    "alias": "Seeker #D19",
+    "display_name": "Joonas Mäkelä",
+    "languages": [{"lang": "fi", "level": "C2"}, {"lang": "en", "level": "B1"}],
+    "needs_relocation": false,
+    "career_path_label": "Hospitality manager to operations",
+    "synthetic_nationality": "FI",
+    "synthetic_university": "Haaga-Helia",
+    "approved": true,
+    "hidden_gem": true,
+    "skills": [
+      {"label": "Hospitality operations", "evidence_quote": "I ran a 40-seat restaurant service and rebuilt the evening shift plan after no-shows."},
+      {"label": "Shift scheduling", "evidence_quote": "I ran a 40-seat restaurant service and rebuilt the evening shift plan after no-shows."},
+      {"label": "Operations planning", "evidence_quote": "I tracked food waste KPIs weekly and changed prep routines based on the numbers."},
+      {"label": "KPI tracking", "evidence_quote": "I tracked food waste KPIs weekly and changed prep routines based on the numbers."},
+      {"label": "Service recovery", "evidence_quote": "I trained staff on how to recover a failed guest experience within ten minutes."},
+      {"label": "Teamwork", "evidence_quote": "I coordinated kitchen and floor teams during peak Friday services."},
+      {"label": "Process improvement", "evidence_quote": "I changed prep routines based on the numbers and cut waste by a visible amount."}
+    ]
+  },
+  {
+    "demo_key": null,
+    "alias": "Seeker #E21",
+    "display_name": "Priya Nair",
+    "languages": [{"lang": "en", "level": "C1"}, {"lang": "hi", "level": "C2"}],
+    "needs_relocation": true,
+    "career_path_label": "Self-taught developer",
+    "synthetic_nationality": "IN",
+    "synthetic_university": "Self-taught / online",
+    "approved": true,
+    "hidden_gem": true,
+    "skills": [
+      {"label": "React", "evidence_quote": "I built an accessible volunteer booking UI in React used by a local NGO."},
+      {"label": "HTML and CSS", "evidence_quote": "I rebuilt the NGO site CSS so keyboard focus states were visible."},
+      {"label": "Accessibility awareness", "evidence_quote": "I rebuilt the NGO site CSS so keyboard focus states were visible."},
+      {"label": "JavaScript", "evidence_quote": "I wrote the client-side validation and fetch logic in JavaScript."},
+      {"label": "Self-directed learning", "evidence_quote": "I learned frontend development through projects because I had no formal CS degree."},
+      {"label": "Git version control", "evidence_quote": "I kept the project history in Git and opened pull requests for volunteer reviewers."}
+    ]
+  }
+]
