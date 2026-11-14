@@ -27,7 +27,7 @@ export function SuggestionCard({
     "Suggested conversation based on evidenced skills.";
 
   return (
-    <article className="glass-card p-5">
+    <article className="glass-card p-5" data-testid="suggestion-card">
       <div className="flex flex-wrap items-center gap-2">
         <span
           className={cn(
@@ -63,6 +63,7 @@ export function SuggestionCard({
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"
+          data-testid="suggestion-why"
           onClick={onWhy}
           className="rounded-xl border border-signal-line px-4 py-2 text-sm font-medium text-signal-ink"
         >
@@ -71,6 +72,7 @@ export function SuggestionCard({
         {onAsk ? (
           <button
             type="button"
+            data-testid="suggestion-ask"
             disabled={askDisabled}
             onClick={onAsk}
             className="rounded-xl bg-signal-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"

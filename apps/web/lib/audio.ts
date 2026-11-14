@@ -76,10 +76,81 @@ export function getSpeechRecognition(): SpeechRecognitionLike | null {
 
 let currentAudio: HTMLAudioElement | null = null;
 let speakToken = 0;
+let audioUnlocked = false;
+let resumeTimer: number | null = null;
+let sharedCtx: AudioContext | null = null;
+
+/** Tiny silent wav — playing it during a click keeps later TTS allowed. */
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
+function getSharedAudioContext(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  const Ctx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Ctx) return null;
+  if (!sharedCtx || sharedCtx.state === "closed") {
+    sharedCtx = new Ctx();
+  }
+  return sharedCtx;
+}
+
+/** Call from a user gesture (mic tap / send / open assistant) so later TTS can play. */
+export function unlockAudio(): void {
+  if (typeof window === "undefined") return;
+  audioUnlocked = true;
+  try {
+    const ctx = getSharedAudioContext();
+    if (ctx) {
+      void ctx.resume();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.0001;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(0);
+      osc.stop(ctx.currentTime + 0.05);
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    // HTMLAudioElement unlock survives the async TTS round-trip better than AudioContext alone.
+    const silent = new Audio(SILENT_WAV);
+    silent.volume = 0.01;
+    void silent.play().then(
+      () => {
+        silent.pause();
+        silent.src = "";
+      },
+      () => undefined,
+    );
+  } catch {
+    /* ignore */
+  }
+  try {
+    window.speechSynthesis?.getVoices();
+  } catch {
+    /* ignore */
+  }
+}
+
+export function isAudioUnlocked(): boolean {
+  return audioUnlocked;
+}
+
+function clearResumeTimer() {
+  if (resumeTimer !== null) {
+    window.clearInterval(resumeTimer);
+    resumeTimer = null;
+  }
+}
 
 /** Stop interviewer TTS immediately (Azure audio + browser speechSynthesis). */
 export function stopSpeaking() {
   speakToken += 1;
+  clearResumeTimer();
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
@@ -87,75 +158,124 @@ export function stopSpeaking() {
   }
   if (typeof window !== "undefined" && window.speechSynthesis) {
     window.speechSynthesis.cancel();
+  }
+}
+
+function stopSpeakingQuiet() {
+  clearResumeTimer();
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = "";
+    currentAudio = null;
+  }
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function speakTimeoutMs(text: string): number {
+  // ~14 chars/sec + buffer; never hang the UI forever
+  return Math.min(60_000, Math.max(8_000, Math.ceil(text.length / 12) * 1000 + 4_000));
+}
+
+function withTimeout(promise: Promise<void>, ms: number, token: number): Promise<void> {
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => {
+      if (speakToken === token) stopSpeakingQuiet();
+      resolve();
+    }, ms);
+    promise
+      .catch(() => undefined)
+      .finally(() => {
+        window.clearTimeout(timer);
+        resolve();
+      });
+  });
+}
+
+async function playAzureTts(text: string, lang: string, token: number): Promise<boolean> {
+  const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const persona =
+    typeof document !== "undefined"
+      ? decodeURIComponent(
+          document.cookie.match(/(?:^|; )signal_persona=([^;]*)/)?.[1] ?? "company_demo",
+        )
+      : "company_demo";
+  const res = await fetch(`${api}/api/voice/tts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Persona-Id": persona,
+    },
+    body: JSON.stringify({ text, lang }),
+  });
+  if (!res.ok) return false;
+  if (speakToken !== token) return true;
+  const blob = await res.blob();
+  if (!blob.size || speakToken !== token) return blob.size === 0 ? false : true;
+  const url = URL.createObjectURL(blob);
+  try {
+    await new Promise<void>((resolve, reject) => {
+      if (speakToken !== token) {
+        URL.revokeObjectURL(url);
+        resolve();
+        return;
+      }
+      const audio = new Audio(url);
+      audio.preload = "auto";
+      currentAudio = audio;
+      // Re-assert unlock in case the browser suspended playback mid-fetch.
+      void getSharedAudioContext()?.resume();
+      audio.onended = () => {
+        if (currentAudio === audio) currentAudio = null;
+        URL.revokeObjectURL(url);
+        resolve();
+      };
+      audio.onerror = () => {
+        if (currentAudio === audio) currentAudio = null;
+        URL.revokeObjectURL(url);
+        reject(new Error("audio play failed"));
+      };
+      const tryPlay = () => {
+        void audio.play().then(
+          () => undefined,
+          (err: unknown) => reject(err instanceof Error ? err : new Error("audio play failed")),
+        );
+      };
+      if (audio.readyState >= 2) tryPlay();
+      else {
+        audio.oncanplaythrough = () => tryPlay();
+        audio.load();
+      }
+    });
+    return true;
+  } catch {
+    URL.revokeObjectURL(url);
+    if (currentAudio) currentAudio = null;
+    return false;
   }
 }
 
 /** Prefer Azure neural TTS; fall back to a carefully chosen browser voice. */
 export async function speakNatural(text: string, lang = "en-GB"): Promise<void> {
+  const trimmed = text.trim();
+  if (!trimmed) return;
   const token = ++speakToken;
   stopSpeakingQuiet();
-  // stopSpeakingQuiet doesn't bump token; restore ours
   speakToken = token;
 
-  try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-    const persona =
-      typeof document !== "undefined"
-        ? decodeURIComponent(
-            document.cookie.match(/(?:^|; )signal_persona=([^;]*)/)?.[1] ?? "seeker_demo_a",
-          )
-        : "seeker_demo_a";
-    const res = await fetch(`${api}/api/voice/tts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Persona-Id": persona,
-      },
-      body: JSON.stringify({ text, lang }),
-    });
-    if (res.ok) {
-      if (speakToken !== token) return;
-      const blob = await res.blob();
-      if (speakToken !== token) return;
-      const url = URL.createObjectURL(blob);
-      await new Promise<void>((resolve, reject) => {
-        if (speakToken !== token) {
-          URL.revokeObjectURL(url);
-          resolve();
-          return;
-        }
-        const audio = new Audio(url);
-        currentAudio = audio;
-        audio.onended = () => {
-          if (currentAudio === audio) currentAudio = null;
-          URL.revokeObjectURL(url);
-          resolve();
-        };
-        audio.onerror = () => {
-          if (currentAudio === audio) currentAudio = null;
-          URL.revokeObjectURL(url);
-          reject(new Error("audio play failed"));
-        };
-        void audio.play().catch(reject);
-      });
-      return;
+  const run = async () => {
+    try {
+      const played = await playAzureTts(trimmed, lang, token);
+      if (played || speakToken !== token) return;
+    } catch {
+      /* fall through to browser */
     }
-  } catch {
-    /* fall through */
-  }
-  if (speakToken !== token) return;
-  await speakBrowser(text, lang, token);
-}
+    if (speakToken !== token) return;
+    await speakBrowser(trimmed, lang, token);
+  };
 
-function stopSpeakingQuiet() {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.src = "";
-    currentAudio = null;
-  }
-  if (typeof window !== "undefined" && window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
+  await withTimeout(run(), speakTimeoutMs(trimmed), token);
 }
 
 function speakBrowser(text: string, lang: string, token: number): Promise<void> {
@@ -168,6 +288,12 @@ function speakBrowser(text: string, lang: string, token: number): Promise<void> 
       resolve();
       return;
     }
+
+    const done = () => {
+      clearResumeTimer();
+      resolve();
+    };
+
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
@@ -176,25 +302,39 @@ function speakBrowser(text: string, lang: string, token: number): Promise<void> 
     const voices = window.speechSynthesis.getVoices();
     const preferred = pickVoice(voices, lang);
     if (preferred) u.voice = preferred;
-    u.onend = () => resolve();
-    u.onerror = () => resolve();
-    if (!voices.length) {
-      window.speechSynthesis.onvoiceschanged = () => {
+    u.onend = done;
+    u.onerror = done;
+
+    const start = () => {
+      if (speakToken !== token) {
+        done();
+        return;
+      }
+      const v = pickVoice(window.speechSynthesis.getVoices(), lang);
+      if (v) u.voice = v;
+      window.speechSynthesis.speak(u);
+      // Chrome bug: utterance can stay paused forever with no onend.
+      clearResumeTimer();
+      resumeTimer = window.setInterval(() => {
         if (speakToken !== token) {
-          resolve();
+          clearResumeTimer();
           return;
         }
-        const v = pickVoice(window.speechSynthesis.getVoices(), lang);
-        if (v) u.voice = v;
-        window.speechSynthesis.speak(u);
-      };
+        if (window.speechSynthesis.speaking && window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+        if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+          done();
+        }
+      }, 250);
+    };
+
+    if (!voices.length) {
+      window.speechSynthesis.onvoiceschanged = () => start();
       window.speechSynthesis.getVoices();
-      setTimeout(() => {
-        if (speakToken === token) window.speechSynthesis.speak(u);
-        else resolve();
-      }, 150);
+      window.setTimeout(start, 150);
     } else {
-      window.speechSynthesis.speak(u);
+      start();
     }
   });
 }

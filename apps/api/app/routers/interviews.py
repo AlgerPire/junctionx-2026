@@ -5,11 +5,12 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.db import get_db
 from app.deps import PersonaContext, resolve_persona
-from app.models import Brief, BriefSkill, Company, InterviewSession
+from app.models import Brief, BriefSkill, InterviewSession
 from app.schemas import BriefOut, BriefSkillOut, LanguageLevel
 from app.services.audit import write_audit
 from app.services.brief_builder import create_brief_from_draft, extract_brief_from_conversation
-from app.services.interviewer import EMPTY_BRIEF_DRAFT, next_turn, opening_line
+from app.services.candidate_pool import company_for_persona
+from app.services.interviewer import EMPTY_BRIEF_DRAFT, next_turn, normalize_lang, opening_line
 
 router = APIRouter(prefix="/api/interviews", tags=["interviews"])
 
@@ -17,10 +18,12 @@ router = APIRouter(prefix="/api/interviews", tags=["interviews"])
 class StartBody(BaseModel):
     kind: str
     owner_id: str
+    lang: str | None = None
 
 
 class TurnBody(BaseModel):
     user_text: str
+    lang: str | None = None
 
 
 class FinalizeBody(BaseModel):
@@ -66,7 +69,8 @@ async def start_interview(
 ) -> dict:
     if body.kind not in {"brief", "story", "followup"}:
         raise HTTPException(status_code=400, detail="Invalid kind")
-    first = opening_line(body.kind)
+    lang = normalize_lang(body.lang)
+    first = opening_line(body.kind, lang)
     draft = dict(EMPTY_BRIEF_DRAFT) if body.kind == "brief" else {}
     session = InterviewSession(
         kind=body.kind,
@@ -74,6 +78,7 @@ async def start_interview(
         messages=[{"role": "assistant", "content": first}],
         draft=draft,
         status="active",
+        lang=lang,
     )
     db.add(session)
     write_audit(
@@ -81,11 +86,11 @@ async def start_interview(
         actor_role=persona.role,
         actor_id=persona.id,
         action="interview_start",
-        payload={"kind": body.kind},
+        payload={"kind": body.kind, "lang": lang},
     )
     db.commit()
     db.refresh(session)
-    return {"session_id": session.id, "first_question": first, "draft": draft}
+    return {"session_id": session.id, "first_question": first, "draft": draft, "lang": lang}
 
 
 @router.post("/{session_id}/turn")
@@ -99,12 +104,15 @@ async def interview_turn(
     session = db.get(InterviewSession, session_id)
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
+    if body.lang:
+        session.lang = normalize_lang(body.lang)
     messages = list(session.messages or [])
     messages.append({"role": "user", "content": body.user_text})
     assistant_text, draft, done = await next_turn(
         kind=session.kind,
         messages=messages,
         draft=dict(session.draft or {}),
+        lang=session.lang or "en",
     )
     messages.append({"role": "assistant", "content": assistant_text})
     session.messages = messages
@@ -116,10 +124,15 @@ async def interview_turn(
         actor_role=persona.role,
         actor_id=persona.id,
         action="interview_turn",
-        payload={"session_id": session.id, "kind": session.kind, "done": done},
+        payload={
+            "session_id": session.id,
+            "kind": session.kind,
+            "done": done,
+            "lang": session.lang,
+        },
     )
     db.commit()
-    return {"assistant_text": assistant_text, "draft": draft, "done": done}
+    return {"assistant_text": assistant_text, "draft": draft, "done": done, "lang": session.lang}
 
 
 @router.post("/{session_id}/finalize")
@@ -137,7 +150,7 @@ async def finalize_interview(
     if session.kind == "brief":
         if persona.role != "company":
             raise HTTPException(status_code=403, detail="Company persona required")
-        company = db.scalar(select(Company).where(Company.demo_key == persona.id))
+        company = company_for_persona(db, persona.id, persona.company_id)
         if company is None:
             raise HTTPException(status_code=404, detail="Company not found")
 

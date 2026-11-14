@@ -15,8 +15,8 @@ const SEEKER_LINKS = [
 ] as const;
 
 const COMPANY_LINKS = [
-  { href: "/company/brief/new", label: "New brief" },
-  { href: "/company/briefs", label: "My briefs" },
+  { href: "/company/brief/new", label: "New job" },
+  { href: "/company/briefs", label: "My jobs" },
   { href: "/company/inbox", label: "Inbox" },
 ] as const;
 

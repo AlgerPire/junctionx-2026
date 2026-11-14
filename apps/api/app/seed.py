@@ -11,6 +11,7 @@ from sqlalchemy import select
 from app.config import get_settings
 from app.db import Base, SessionLocal, engine
 from app.models import (
+    Approach,
     Brief,
     BriefSkill,
     Company,
@@ -143,13 +144,14 @@ def upsert_skills(db) -> dict[str, Skill]:
     return {s.label: s for s in existing.values()}
 
 
-def _ensure_columns() -> None:
+def ensure_columns() -> None:
     """Lightweight additive migrations for local/pilot DBs (no Alembic yet)."""
     from sqlalchemy import text
 
     statements = [
         "ALTER TABLE skills ADD COLUMN IF NOT EXISTS labels JSON DEFAULT '{}'",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_completed BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE interview_sessions ADD COLUMN IF NOT EXISTS lang VARCHAR(8) NOT NULL DEFAULT 'en'",
     ]
     with engine.begin() as conn:
         for sql in statements:
@@ -159,9 +161,43 @@ def _ensure_columns() -> None:
                 pass
 
 
+DEMO_REQUESTS = [
+    ("Seeker #G02", "requested"),
+    ("Seeker #G16", "requested"),
+    ("Seeker #G22", "requested"),
+    ("Seeker #G31", "accepted"),
+]
+
+
+def seed_demo_requests(db) -> None:
+    """Give the demo company inbox a few synthetic conversation requests (only if missing)."""
+    company = db.scalar(select(Company).where(Company.demo_key == "company_demo"))
+    if company is None:
+        return
+    brief = db.scalar(
+        select(Brief)
+        .where(Brief.company_id == company.id, Brief.status == "published")
+        .order_by(Brief.id)
+    )
+    if brief is None:
+        return
+    for alias, status in DEMO_REQUESTS:
+        seeker = db.scalar(select(Seeker).where(Seeker.alias == alias))
+        if seeker is None:
+            continue
+        exists = db.scalar(
+            select(Approach).where(Approach.seeker_id == seeker.id, Approach.brief_id == brief.id)
+        )
+        if exists is not None:
+            continue
+        db.add(Approach(seeker_id=seeker.id, brief_id=brief.id, status=status))
+        seeker.approach_budget_remaining = max(seeker.approach_budget_remaining - 1, 0)
+    db.commit()
+
+
 def seed() -> None:
     Base.metadata.create_all(bind=engine)
-    _ensure_columns()
+    ensure_columns()
     db = SessionLocal()
     try:
         by_label = upsert_skills(db)
@@ -326,6 +362,7 @@ def seed() -> None:
                     )
                 )
         db.commit()
+        seed_demo_requests(db)
 
         skill_index.load_from_db(db)
         print(

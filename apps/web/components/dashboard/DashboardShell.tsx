@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 
 import { PageLoader } from "@/components/shared/PageLoader";
 import { getPersonaId, setPersonaId } from "@/lib/api";
-import { ROLE_META, type AppRole } from "@/lib/nav";
+import { personaForRole, ROLE_META, type AppRole } from "@/lib/nav";
+
+import { cn } from "@/lib/utils";
 
 import { FooterNote, PageWaves } from "./PageWaves";
 import { Sidebar } from "./Sidebar";
@@ -15,25 +17,31 @@ export function DashboardShell({
   title,
   subtitle,
   children,
+  fitViewport = false,
 }: {
   role: AppRole;
   title: string;
   subtitle?: string;
   children: React.ReactNode;
+  /** Keep the main column to one screen — no page scroll. */
+  fitViewport?: boolean;
 }) {
   const [ready, setReady] = useState(false);
   const meta = ROLE_META[role];
   const seeker = role === "seeker";
+  const organiser = role === "organiser";
+  const theme = seeker ? "seeker" : organiser ? "organiser" : undefined;
+  const waveVariant = seeker ? "seeker" : organiser ? "organiser" : "company";
 
   useEffect(() => {
     const fromQuery = new URLSearchParams(window.location.search).get("persona");
-    setPersonaId(fromQuery ?? getPersonaId() ?? meta.personaDefault);
+    setPersonaId(personaForRole(role, fromQuery ?? getPersonaId()));
     setReady(true);
-  }, [meta.personaDefault]);
+  }, [role]);
 
   if (!ready) {
     return (
-      <div className="min-h-screen" data-theme={seeker ? "seeker" : undefined}>
+      <div className="min-h-screen" data-theme={theme}>
         <PageLoader />
       </div>
     );
@@ -42,20 +50,44 @@ export function DashboardShell({
   return (
     <div
       className="dash-bg relative flex h-dvh max-h-dvh overflow-hidden"
-      data-theme={seeker ? "seeker" : undefined}
+      data-theme={theme}
     >
-      <PageWaves variant={seeker ? "seeker" : "company"} />
+      <PageWaves variant={waveVariant} />
       <div className="relative z-10 hidden h-full shrink-0 flex-col p-4 pr-0 md:flex">
         <Sidebar role={role} />
       </div>
-      <div className="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
-        <header className="flex shrink-0 items-start justify-between gap-4 px-5 pb-2 pt-8 sm:px-8 lg:px-10">
+      <div
+        className={cn(
+          "relative z-10 flex min-h-0 min-w-0 flex-1 flex-col",
+          fitViewport ? "overflow-hidden" : "overflow-y-auto",
+        )}
+      >
+        <header
+          className={cn(
+            "flex shrink-0 items-start justify-between gap-4 px-5 sm:px-8 lg:px-10",
+            fitViewport ? "pb-1 pt-5" : "pb-2 pt-8",
+          )}
+        >
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-signal-ink sm:text-[40px] sm:leading-[1.1]">
+            <h1
+              className={cn(
+                "font-extrabold tracking-tight text-signal-ink",
+                fitViewport
+                  ? "text-2xl sm:text-[32px] sm:leading-[1.15]"
+                  : "text-3xl sm:text-[40px] sm:leading-[1.1]",
+              )}
+            >
               {title}
             </h1>
             {subtitle ? (
-              <p className="mt-2 max-w-2xl text-base text-signal-muted sm:text-lg">{subtitle}</p>
+              <p
+                className={cn(
+                  "max-w-2xl text-signal-muted",
+                  fitViewport ? "mt-1 text-sm sm:text-base" : "mt-2 text-base sm:text-lg",
+                )}
+              >
+                {subtitle}
+              </p>
             ) : null}
           </div>
           <div className="flex shrink-0 items-center gap-5 pt-1">
@@ -67,18 +99,31 @@ export function DashboardShell({
               <Bell className="h-6 w-6" strokeWidth={1.8} />
               <span className="absolute right-0 top-0 h-2 w-2 rounded-full border-2 border-signal-bg bg-signal-teal" />
             </button>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[var(--signal-orb-from)] to-[var(--signal-orb-to)] text-lg font-semibold text-white shadow-glass">
+            <div
+              className={cn(
+                "flex items-center justify-center rounded-full bg-gradient-to-b from-[var(--signal-orb-from)] to-[var(--signal-orb-to)] font-semibold text-white shadow-glass",
+                fitViewport ? "h-10 w-10 text-base" : "h-12 w-12 text-lg",
+              )}
+            >
               {meta.title.slice(0, 1)}
             </div>
           </div>
         </header>
-        <main id="main" className="relative flex-1 px-5 py-6 sm:px-8 lg:px-10">
+        <main
+          id="main"
+          className={cn(
+            "relative flex-1 px-5 sm:px-8 lg:px-10",
+            fitViewport ? "flex min-h-0 flex-col overflow-hidden py-3" : "py-6",
+          )}
+        >
           {children}
         </main>
-        <FooterNote>
+        <FooterNote compact={fitViewport}>
           {seeker
             ? "Your words. Your evidence. You choose who hears it."
-            : "AI helps people explain themselves. Humans decide who to talk to."}
+            : organiser
+              ? "Aggregates only. Humans decide how to close the gaps."
+              : "AI helps people explain themselves. Humans decide who to talk to."}
         </FooterNote>
       </div>
     </div>

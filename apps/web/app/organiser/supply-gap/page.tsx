@@ -51,7 +51,7 @@ export default function OrganiserSupplyGapPage() {
       title="Supply gap"
       subtitle="Aggregated demand vs evidenced supply — small cells are suppressed."
     >
-      <section className="glass-card p-6">
+      <section className="glass-card p-6" data-testid="supply-gap-chart">
         <CardHeader
           title="Demand vs supply by skill"
           action={
@@ -82,7 +82,7 @@ export default function OrganiserSupplyGapPage() {
         </div>
       </section>
 
-      <section className="mt-6 glass-card p-6">
+      <section className="mt-6 glass-card p-6" data-testid="supply-gap-list">
         <CardHeader title="Largest gaps" />
         <ul className="mt-3 divide-y divide-signal-line">
           {gap.data?.slice(0, 12).map((r) => (

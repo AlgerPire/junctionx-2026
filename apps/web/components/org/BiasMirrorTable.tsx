@@ -10,7 +10,7 @@ export function BiasMirrorTable({
   attributes: Record<string, AttrResult>;
 }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-signal-line/80 bg-white/80">
+    <div data-testid="bias-mirror" className="overflow-x-auto rounded-2xl border border-signal-line/80 bg-white/80">
       <table className="min-w-full text-left text-sm">
         <thead className="border-b border-signal-line bg-signal-mist/60">
           <tr>

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { PageLoader } from "@/components/shared/PageLoader";
 import { getPersonaId } from "@/lib/api";
 import { APP_NAME } from "@/lib/brand";
 import { roleFromPersona, type AppRole } from "@/lib/nav";
@@ -30,11 +31,19 @@ export function AppShell({
   role?: AppRole;
 }) {
   const pathname = usePathname();
-  const [role, setRole] = useState<AppRole>(roleProp ?? "seeker");
+  const [role, setRole] = useState<AppRole | null>(roleProp ?? null);
 
   useEffect(() => {
     setRole(roleProp ?? roleFromPath(pathname) ?? roleFromPersona(getPersonaId()) ?? "seeker");
   }, [pathname, roleProp]);
+
+  if (!role) {
+    return (
+      <div className="min-h-screen">
+        <PageLoader />
+      </div>
+    );
+  }
 
   return (
     <DashboardShell role={role} title={title || APP_NAME} subtitle={subtitle}>

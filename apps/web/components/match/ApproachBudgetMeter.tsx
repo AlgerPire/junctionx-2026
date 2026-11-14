@@ -6,7 +6,7 @@ export function ApproachBudgetMeter({
   total?: number;
 }) {
   return (
-    <div className="glass-card p-4">
+    <div className="glass-card p-4" data-testid="budget-meter">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-signal-ink">Approach budget</p>
         <p className="text-sm text-signal-muted">

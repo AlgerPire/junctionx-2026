@@ -210,6 +210,26 @@ class InterviewSession(Base):
     messages: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False, default=list)
     draft: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="active")
+    lang: Mapped[str] = mapped_column(String(8), nullable=False, default="en", server_default="en")
+
+
+class Invite(Base):
+    """Company-initiated interview invitation. The seeker accepts or declines; nothing is automatic."""
+
+    __tablename__ = "interview_invites"
+    __table_args__ = (UniqueConstraint("seeker_id", "brief_id", name="uq_seeker_brief_invite"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    seeker_id: Mapped[int] = mapped_column(ForeignKey("seekers.id"), nullable=False)
+    brief_id: Mapped[int] = mapped_column(ForeignKey("briefs.id"), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="invited")
+    message: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    proposed_slot: Mapped[str] = mapped_column(String(120), nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    seeker: Mapped[Seeker] = relationship()
+    brief: Mapped[Brief] = relationship()
 
 
 class AuditLog(Base):

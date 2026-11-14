@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { apiFetch } from "@/lib/api";
-import { speakNatural, stopSpeaking } from "@/lib/audio";
+import { speakNatural, stopSpeaking, unlockAudio } from "@/lib/audio";
+import { getSpeechLang, noteUserLanguageSample } from "@/lib/speechLang";
 
 type Status = "idle" | "listening" | "transcribing" | "thinking" | "speaking" | "done";
 
@@ -15,6 +16,7 @@ export function useInterview() {
   const [error, setError] = useState<string | null>(null);
   const [muted, setMuted] = useState(false);
   const [briefId, setBriefId] = useState<number | null>(null);
+  const [replying, setReplying] = useState(false);
   const speakGen = useRef(0);
 
   useEffect(() => {
@@ -27,10 +29,11 @@ export function useInterview() {
   const speak = useCallback(
     async (text: string) => {
       if (muted || !text.trim()) return;
+      unlockAudio();
       const gen = ++speakGen.current;
       setStatus("speaking");
       try {
-        await speakNatural(text, "en-GB");
+        await speakNatural(text, getSpeechLang());
       } catch {
         /* ignore play errors */
       }
@@ -43,8 +46,10 @@ export function useInterview() {
 
   const runTurn = useCallback(
     async (sid: number, text: string) => {
+      noteUserLanguageSample(text);
       setMessages((m) => [...m, { role: "user", content: text }]);
       setStatus("thinking");
+      setReplying(true);
       try {
         const res = await apiFetch<{
           assistant_text: string;
@@ -52,13 +57,15 @@ export function useInterview() {
           done: boolean;
         }>(`/api/interviews/${sid}/turn`, {
           method: "POST",
-          body: JSON.stringify({ user_text: text }),
+          body: JSON.stringify({ user_text: text, lang: getSpeechLang() }),
         });
         setDraft(res.draft ?? {});
         setMessages((m) => [...m, { role: "assistant", content: res.assistant_text }]);
+        setReplying(false);
         await speak(res.assistant_text);
         setStatus(res.done ? "done" : "listening");
       } catch (err) {
+        setReplying(false);
         setError(err instanceof Error ? err.message : "Turn failed");
         setStatus("listening");
       }
@@ -71,6 +78,7 @@ export function useInterview() {
       setError(null);
       setBriefId(null);
       setStatus("thinking");
+      setReplying(true);
       try {
         const res = await apiFetch<{
           session_id: number;
@@ -78,8 +86,9 @@ export function useInterview() {
           draft?: Record<string, unknown>;
         }>("/api/interviews", {
           method: "POST",
-          body: JSON.stringify({ kind, owner_id: ownerId }),
+          body: JSON.stringify({ kind, owner_id: ownerId, lang: getSpeechLang() }),
         });
+        setReplying(false);
         setSessionId(res.session_id);
         setMessages([{ role: "assistant", content: res.first_question }]);
         if (res.draft) setDraft(res.draft);
@@ -90,6 +99,7 @@ export function useInterview() {
         await speak(res.first_question);
         setStatus("listening");
       } catch (err) {
+        setReplying(false);
         setError(err instanceof Error ? err.message : "Could not start interview");
         setStatus("idle");
       }
@@ -142,6 +152,7 @@ export function useInterview() {
     muted,
     setMuted,
     briefId,
+    replying,
     start,
     sendUserText,
     finalize,

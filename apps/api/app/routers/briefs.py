@@ -1,3 +1,5 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -5,11 +7,17 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.db import get_db
 from app.deps import PersonaContext, resolve_persona
-from app.models import Brief, BriefSkill, Company
+from app.models import Brief, BriefSkill
 from app.schemas import BriefOut, BriefSkillOut, LanguageLevel
 from app.services.audit import write_audit
+from app.services.candidate_pool import company_for_persona
 
 router = APIRouter(prefix="/api/briefs", tags=["briefs"])
+
+
+class SkillImportanceChange(BaseModel):
+    skill_id: int
+    importance: Literal["must", "learnable", "nice"]
 
 
 class BriefPatch(BaseModel):
@@ -20,6 +28,16 @@ class BriefPatch(BaseModel):
     relocation_support: bool | None = None
     international_ok: bool | None = None
     work_mode: str | None = None
+    skill_importance: list[SkillImportanceChange] | None = None
+
+
+def apply_skill_importance(brief: Brief, changes: list[SkillImportanceChange]) -> None:
+    by_skill = {bs.skill_id: bs for bs in brief.skills}
+    unknown = [c.skill_id for c in changes if c.skill_id not in by_skill]
+    if unknown:
+        raise HTTPException(status_code=422, detail=f"Skills not in this brief: {unknown}")
+    for change in changes:
+        by_skill[change.skill_id].importance = change.importance
 
 
 def _brief_out(brief: Brief) -> BriefOut:
@@ -64,7 +82,7 @@ def list_briefs(
         selectinload(Brief.company),
     )
     if persona.role == "company":
-        company = db.scalar(select(Company).where(Company.demo_key == persona.id))
+        company = company_for_persona(db, persona.id, persona.company_id)
         if company is None:
             return []
         stmt = stmt.where(Brief.company_id == company.id)
@@ -72,6 +90,7 @@ def list_briefs(
         stmt = stmt.where(Brief.status == "published")
     if status:
         stmt = stmt.where(Brief.status == status)
+    stmt = stmt.order_by(Brief.created_at.desc())
     return [_brief_out(b) for b in db.scalars(stmt).all()]
 
 
@@ -115,14 +134,21 @@ def patch_brief(
     if brief is None:
         raise HTTPException(status_code=404, detail="Brief not found")
     changes = body.model_dump(exclude_unset=True)
+    if body.skill_importance:
+        apply_skill_importance(brief, body.skill_importance)
     for field, value in changes.items():
-        setattr(brief, field, value)
+        if field != "skill_importance":
+            setattr(brief, field, value)
     write_audit(
         db,
         actor_role=persona.role,
         actor_id=persona.id,
         action="brief_patch",
-        payload={"brief_id": brief.id, "fields": sorted(changes.keys())},
+        payload={
+            "brief_id": brief.id,
+            "fields": sorted(changes.keys()),
+            "skill_importance": changes.get("skill_importance", []),
+        },
     )
     db.commit()
     db.refresh(brief)

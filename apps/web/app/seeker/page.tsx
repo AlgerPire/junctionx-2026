@@ -53,7 +53,7 @@ export default function SeekerDashboardPage() {
         <div className="grid lg:grid-cols-[1.55fr_1fr]">
           <div className="relative overflow-hidden px-6 py-8 sm:px-8 sm:py-9">
             <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_0%_0%,rgba(14,124,116,0.14),transparent_55%),radial-gradient(ellipse_50%_60%_at_100%_100%,rgba(224,90,60,0.10),transparent_50%)]"
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_0%_0%,rgba(47,91,184,0.14),transparent_55%),radial-gradient(ellipse_50%_60%_at_100%_100%,rgba(74,120,214,0.10),transparent_50%)]"
               aria-hidden
             />
             <div className="relative">
@@ -147,7 +147,7 @@ export default function SeekerDashboardPage() {
               icon: Ticket,
               value: String(budget),
               label: "Approaches left",
-              tone: "coral" as const,
+              tone: "deep" as const,
             },
           ].map(({ icon: Icon, value, label, tone }) => (
             <div key={label} className="flex items-center gap-4 px-6 py-5">
@@ -156,7 +156,7 @@ export default function SeekerDashboardPage() {
                   "flex h-11 w-11 items-center justify-center rounded-2xl",
                   tone === "accent" && "bg-signal-accentSoft text-signal-accent",
                   tone === "sky" && "bg-signal-skySoft text-signal-sky",
-                  tone === "coral" && "bg-signal-tealSoft text-signal-teal",
+                  tone === "deep" && "bg-signal-tealSoft text-signal-teal",
                 )}
               >
                 <Icon className="h-5 w-5" />

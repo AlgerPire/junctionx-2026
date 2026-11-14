@@ -1,8 +1,13 @@
 import { Sparkles } from "lucide-react";
 
 /** Soft atmospheric waves along the bottom of every dashboard. */
-export function PageWaves({ variant = "company" }: { variant?: "company" | "seeker" }) {
+export function PageWaves({
+  variant = "company",
+}: {
+  variant?: "company" | "seeker" | "organiser";
+}) {
   const seeker = variant === "seeker";
+  const organiser = variant === "organiser";
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 overflow-hidden" aria-hidden>
       <svg
@@ -14,9 +19,15 @@ export function PageWaves({ variant = "company" }: { variant?: "company" | "seek
           <linearGradient id={`wave-a-${variant}`} x1="0" x2="1" y1="0" y2="0">
             {seeker ? (
               <>
-                <stop offset="0%" stopColor="#1aa89c" stopOpacity="0.45" />
-                <stop offset="55%" stopColor="#7ecfc5" stopOpacity="0.28" />
-                <stop offset="100%" stopColor="#e05a3c" stopOpacity="0.32" />
+                <stop offset="0%" stopColor="#2f5bb8" stopOpacity="0.45" />
+                <stop offset="55%" stopColor="#7a9ee0" stopOpacity="0.28" />
+                <stop offset="100%" stopColor="#4a78d6" stopOpacity="0.32" />
+              </>
+            ) : organiser ? (
+              <>
+                <stop offset="0%" stopColor="#2d7a52" stopOpacity="0.45" />
+                <stop offset="55%" stopColor="#7ab892" stopOpacity="0.28" />
+                <stop offset="100%" stopColor="#4aad72" stopOpacity="0.32" />
               </>
             ) : (
               <>
@@ -29,8 +40,13 @@ export function PageWaves({ variant = "company" }: { variant?: "company" | "seek
           <linearGradient id={`wave-b-${variant}`} x1="0" x2="1" y1="0" y2="0">
             {seeker ? (
               <>
-                <stop offset="0%" stopColor="#b8e4dc" stopOpacity="0.55" />
-                <stop offset="100%" stopColor="#f0c4b6" stopOpacity="0.4" />
+                <stop offset="0%" stopColor="#c5d4f0" stopOpacity="0.55" />
+                <stop offset="100%" stopColor="#b8c9eb" stopOpacity="0.4" />
+              </>
+            ) : organiser ? (
+              <>
+                <stop offset="0%" stopColor="#c5e4d2" stopOpacity="0.55" />
+                <stop offset="100%" stopColor="#b8dcc6" stopOpacity="0.4" />
               </>
             ) : (
               <>
@@ -55,10 +71,22 @@ export function PageWaves({ variant = "company" }: { variant?: "company" | "seek
   );
 }
 
-export function FooterNote({ children }: { children: React.ReactNode }) {
+export function FooterNote({
+  children,
+  compact,
+}: {
+  children: React.ReactNode;
+  compact?: boolean;
+}) {
   return (
-    <p className="relative z-10 flex items-center justify-center gap-2 pb-6 pt-10 text-sm text-signal-muted">
-      <Sparkles className="h-4 w-4 text-signal-accent" />
+    <p
+      className={
+        compact
+          ? "relative z-10 flex shrink-0 items-center justify-center gap-2 px-4 pb-3 pt-2 text-xs text-signal-muted"
+          : "relative z-10 flex items-center justify-center gap-2 pb-6 pt-10 text-sm text-signal-muted"
+      }
+    >
+      <Sparkles className="h-4 w-4 shrink-0 text-signal-accent" />
       {children}
     </p>
   );

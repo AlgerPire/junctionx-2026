@@ -30,7 +30,7 @@ export function LiveBriefCard({ draft }: { draft: Record<string, unknown> }) {
   const missing = d.missing || [];
 
   return (
-    <div className="glass-card p-5">
+    <div className="glass-card p-5" data-testid="brief-card">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-signal-accent">
           Live job listing · you decide
@@ -60,7 +60,7 @@ export function LiveBriefCard({ draft }: { draft: Record<string, unknown> }) {
           <p className="text-xs font-semibold uppercase tracking-wide text-signal-ink/50">Must-have</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {must.map((s) => (
-              <span key={s} className="rounded-lg border border-signal-accent/30 bg-signal-accentSoft px-2 py-1 text-xs font-medium text-signal-accent">
+              <span key={s} data-testid="brief-card-skill" className="rounded-lg border border-signal-accent/30 bg-signal-accentSoft px-2 py-1 text-xs font-medium text-signal-accent">
                 {s}
               </span>
             ))}

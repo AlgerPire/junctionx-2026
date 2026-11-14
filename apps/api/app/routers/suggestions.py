@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session
 
+from app.db import get_db
 from app.deps import (
     PersonaContext,
     load_published_briefs,
@@ -10,10 +11,9 @@ from app.deps import (
     to_brief_view,
     to_seeker_skill_view,
 )
-from app.db import get_db
-from app.models import Brief, BriefSkill, Seeker, SkillStory
 from app.schemas import BriefOut, BriefSkillOut, LanguageLevel, Suggestion, SuggestionsResponse
 from app.services.audit import write_audit
+from app.services.candidate_pool import load_brief, suggested_candidates
 from app.services.embeddings import skill_index
 from app.services.match_explain import attach_overview
 from app.services.matching import match, rank_suggestions
@@ -70,32 +70,11 @@ def suggestions_for_brief(
     db: Session = Depends(get_db),
     persona: PersonaContext = Depends(resolve_persona),
 ) -> list[Suggestion]:
-    brief = db.scalar(
-        select(Brief)
-        .where(Brief.id == brief_id)
-        .options(
-            selectinload(Brief.skills).selectinload(BriefSkill.skill),
-            selectinload(Brief.company),
-        )
-    )
+    brief = load_brief(db, brief_id)
     if brief is None or brief.status != "published":
         raise HTTPException(status_code=404, detail="Brief not found")
 
-    brief_view = to_brief_view(brief)
-    seekers = db.scalars(select(Seeker)).all()
-    scored: list[tuple[Suggestion, float]] = []
-    for seeker in seekers:
-        view = to_seeker_skill_view(db, seeker)
-        if view is None:
-            continue
-        sug, coverage = match(view, brief_view, skill_index.sim, event_id=brief.event_id)
-        if sug is None:
-            continue
-        sug.seeker_alias = seeker.alias
-        attach_overview(sug, coverage, perspective="company")
-        scored.append((sug, coverage))
-
-    ranked = rank_suggestions(scored, event_id=brief.event_id)[:8]
+    ranked = suggested_candidates(db, brief)
     write_audit(
         db,
         actor_role=persona.role,

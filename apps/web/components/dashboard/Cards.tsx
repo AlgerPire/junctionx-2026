@@ -45,19 +45,40 @@ export function StatusPill({ label, tone = "teal" }: { label: string; tone?: Ton
 
 export function StatRow({
   stats,
+  compact,
 }: {
   stats: { icon: LucideIcon; value: string; label: string; tone: Tone }[];
+  compact?: boolean;
 }) {
   return (
     <div className="grid border-t border-signal-line sm:grid-cols-3 sm:divide-x sm:divide-signal-line">
       {stats.map(({ icon: Icon, value, label, tone }) => (
-        <div key={label} className="flex items-center gap-4 px-6 py-5">
-          <span className={cn("flex h-12 w-12 items-center justify-center rounded-2xl", TILE[tone])}>
-            <Icon className="h-5 w-5" />
+        <div
+          key={label}
+          className={cn(
+            "flex items-center gap-4",
+            compact ? "px-4 py-3 sm:px-5" : "px-6 py-5",
+          )}
+        >
+          <span
+            className={cn(
+              "flex items-center justify-center rounded-2xl",
+              TILE[tone],
+              compact ? "h-10 w-10" : "h-12 w-12",
+            )}
+          >
+            <Icon className={compact ? "h-4 w-4" : "h-5 w-5"} />
           </span>
           <div>
-            <p className="text-2xl font-bold leading-none text-signal-ink">{value}</p>
-            <p className="mt-1.5 text-xs text-signal-muted">{label}</p>
+            <p
+              className={cn(
+                "font-bold leading-none text-signal-ink",
+                compact ? "text-xl" : "text-2xl",
+              )}
+            >
+              {value}
+            </p>
+            <p className={cn("text-xs text-signal-muted", compact ? "mt-1" : "mt-1.5")}>{label}</p>
           </div>
         </div>
       ))}

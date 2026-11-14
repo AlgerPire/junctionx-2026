@@ -175,6 +175,7 @@ export default function SeekerStoryPage() {
               <div className="relative mt-8 flex flex-wrap gap-3">
                 <button
                   type="button"
+                  data-testid="story-start"
                   onClick={() => void beginStory()}
                   className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-signal-ink transition hover:bg-white/95"
                 >
@@ -264,11 +265,14 @@ export default function SeekerStoryPage() {
             </section>
           )}
 
-          {started ? <TranscriptPanel messages={interview.messages} /> : null}
+          {started ? <TranscriptPanel messages={interview.messages} thinking={interview.replying} /> : null}
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-[28px] border border-signal-line/80 bg-white/95 p-6 shadow-soft">
+          <section
+            data-testid="story-review"
+            className="rounded-[28px] border border-signal-line/80 bg-white/95 p-6 shadow-soft"
+          >
             <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-signal-tealSoft text-signal-teal">
                 <ShieldCheck className="h-5 w-5" />
@@ -289,19 +293,24 @@ export default function SeekerStoryPage() {
                 {story.skills.map((s) => (
                   <li
                     key={s.skill_id}
+                    data-testid="story-skill"
                     className="rounded-2xl border border-signal-line/90 bg-signal-foam px-4 py-3"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold text-signal-ink">{s.label}</p>
                       <button
                         type="button"
+                        data-testid="story-skill-remove"
                         className="text-xs font-medium text-signal-muted hover:text-signal-warn"
                         onClick={() => removeSkill.mutate({ id: story.id, skillId: s.skill_id })}
                       >
                         Remove
                       </button>
                     </div>
-                    <p className="mt-2 border-l-2 border-signal-accent/50 pl-3 text-sm italic text-signal-ink/75">
+                    <p
+                      data-testid="story-evidence-quote"
+                      className="mt-2 border-l-2 border-signal-accent/50 pl-3 text-sm italic text-signal-ink/75"
+                    >
                       In your words: “{s.evidence_quote}”
                     </p>
                   </li>
@@ -319,6 +328,7 @@ export default function SeekerStoryPage() {
               {story && story.status !== "approved" ? (
                 <button
                   type="button"
+                  data-testid="story-approve"
                   className="rounded-2xl bg-signal-accent px-5 py-3 text-sm font-semibold text-white hover:bg-signal-accentDeep"
                   onClick={() => approve.mutate(story.id)}
                   disabled={approve.isPending || !story.skills?.length}
@@ -326,7 +336,10 @@ export default function SeekerStoryPage() {
                   {approve.isPending ? "Saving…" : "Approve and share"}
                 </button>
               ) : (
-                <p className="rounded-xl bg-signal-accentSoft px-3 py-2 text-sm font-medium text-signal-accent">
+                <p
+                  data-testid="story-status"
+                  className="rounded-xl bg-signal-accentSoft px-3 py-2 text-sm font-medium text-signal-accent"
+                >
                   Status: {story?.status ?? "no story yet"}
                 </p>
               )}

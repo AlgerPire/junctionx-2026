@@ -22,7 +22,7 @@ export const SEEKER_ONBOARDING: OnboardingStep[] = [
   },
   {
     title: "Then choose conversations",
-    body: "After you approve your story, browse suggested meetings with plain-language reasons — or explore every brief. You decide whom to contact.",
+    body: "After you approve your story, browse suggested meetings with plain-language reasons — or explore every job. You decide whom to contact.",
     tip: "AI suggests. You decide where to go.",
   },
 ];
@@ -34,8 +34,8 @@ export const COMPANY_ONBOARDING: OnboardingStep[] = [
     tip: "No automated rejection. No hiring score. Your recruiters choose whom to meet.",
   },
   {
-    title: "Create a voice hiring brief",
-    body: "Talk through the role: the 90-day problem, must-have vs learnable skills, languages, and support for international talent. A live brief builds on screen as you go.",
+    title: "Create a voice hiring job",
+    body: "Talk through the role: the 90-day problem, must-have vs learnable skills, languages, and support for international talent. A live job listing builds on screen as you go.",
     tip: "You can type instead of speaking anytime. Edit everything before you publish.",
   },
   {
@@ -46,6 +46,6 @@ export const COMPANY_ONBOARDING: OnboardingStep[] = [
   {
     title: "Inbox and event day",
     body: "Accept or decline approaches, keep capacity realistic, and use the International Readiness card so candidates know languages, permits and relocation support.",
-    tip: "An Espoo advisor can help review briefs before the event.",
+    tip: "An Espoo advisor can help review jobs before the event.",
   },
 ];

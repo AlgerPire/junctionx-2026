@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { ApproachBudgetMeter } from "@/components/match/ApproachBudgetMeter";
 import { SuggestionCard } from "@/components/match/SuggestionCard";
 import { WhyPanel } from "@/components/match/WhyPanel";
+import { SeekerInvitations } from "@/components/seeker/SeekerInvitations";
 import { AppShell } from "@/components/shared/AppShell";
 import { apiFetch, getPersonaId, setPersonaId } from "@/lib/api";
 import type { Brief, Suggestion, SuggestionsResponse } from "@/lib/types";
@@ -66,6 +67,8 @@ export default function SeekerEventPage() {
         </div>
         <span className="text-sm font-semibold text-signal-accent">Open →</span>
       </Link>
+
+      <SeekerInvitations enabled={personaReady} />
 
       <ApproachBudgetMeter remaining={remaining} />
 

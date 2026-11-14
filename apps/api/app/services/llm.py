@@ -44,6 +44,7 @@ async def chat_json(
     system: str,
     user: str,
     timeout: float = 20.0,
+    temperature: float = 0.1,
 ) -> dict[str, Any]:
     """Provider adapter with one retry; supports OpenAI and Azure OpenAI."""
     url, headers, model = _chat_url_and_headers()
@@ -53,7 +54,7 @@ async def chat_json(
             {"role": "user", "content": user},
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.1,
+        "temperature": temperature,
     }
     # Azure deployment is in the URL; OpenAI wants model in body.
     settings = get_settings()

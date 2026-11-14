@@ -1,4 +1,4 @@
-interface AuditEntry {
+export interface AuditEntry {
   id: number;
   ts: string;
   actor_role: string;
@@ -7,14 +7,31 @@ interface AuditEntry {
   payload: Record<string, unknown>;
 }
 
-const ACTION_LABEL: Record<string, string> = {
-  brief_publish: "A hiring brief was published",
+export const ACTION_LABEL: Record<string, string> = {
+  brief_publish: "A hiring job was published",
+  brief_patch: "A hiring job was edited by a person",
+  brief_create_from_interview: "A brief draft was created from a conversation",
+  story_patch: "A skill story was edited by the jobseeker",
   story_approve: "A skill story was approved and shared",
+  interview_start: "A voice or text conversation started",
+  interview_turn: "A conversation answer was given",
+  interview_finalize: "A conversation was finished",
   approach_create: "A conversation was requested",
   approach_decide: "An approach was accepted or declined",
+  invite_create: "An interview invitation was sent",
+  invite_respond: "An interview invitation was answered",
+  invite_withdraw: "An interview invitation was withdrawn",
   suggestion_view: "Suggestions were viewed",
   fairness_run: "Bias Mirror was run",
+  copilot_ask: "The assistant was asked a question",
+  followup_create: "A follow-up was recorded",
+  consent_grant: "Consent was given",
+  consent_withdraw: "Consent was withdrawn",
   delete_my_data: "Seeker data was deleted",
+  auth_request_link: "A sign-in link was requested",
+  auth_login: "Someone signed in",
+  auth_logout: "Someone signed out",
+  onboarding_complete: "Onboarding was completed",
 };
 
 export function AuditLogTable({ entries }: { entries: AuditEntry[] }) {

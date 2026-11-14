@@ -9,13 +9,22 @@ class STTError(Exception):
     pass
 
 
+_CANDIDATE_LOCALES = ("en-GB", "fi-FI", "sv-SE", "uk-UA")
+
+
+def _is_auto(lang: str | None) -> bool:
+    return not lang or lang.strip().lower() in {"auto", "detect", "und"}
+
+
 def _locale(lang: str | None) -> str:
-    if not lang:
-        return "en-GB"
-    if "-" in lang or "_" in lang:
-        return lang.replace("_", "-")
-    mapping = {"en": "en-GB", "fi": "fi-FI", "sv": "sv-SE"}
-    return mapping.get(lang.lower(), "en-GB")
+    """Resolve a concrete BCP-47 locale, or a comma list for Azure LID when Auto."""
+    if _is_auto(lang):
+        return ",".join(_CANDIDATE_LOCALES)
+    cleaned = lang.replace("_", "-").strip()
+    if "-" in cleaned:
+        return cleaned
+    mapping = {"en": "en-GB", "fi": "fi-FI", "sv": "sv-SE", "uk": "uk-UA", "ua": "uk-UA"}
+    return mapping.get(cleaned.lower(), "en-GB")
 
 
 async def transcribe_audio(
@@ -27,6 +36,7 @@ async def transcribe_audio(
 ) -> str:
     settings = get_settings()
     locale = _locale(lang)
+    whisper_lang = None if _is_auto(lang) else lang
 
     if settings.stt_provider == "azure" and settings.azure_speech_key:
         return await _azure_speech(data, content_type=content_type, locale=locale)
@@ -36,7 +46,7 @@ async def transcribe_audio(
             data,
             content_type=content_type,
             filename=filename,
-            lang=lang,
+            lang=whisper_lang,
             api_key=settings.llm_api_key,
             model=settings.stt_model,
         )
@@ -48,6 +58,7 @@ async def _azure_speech(data: bytes, *, content_type: str, locale: str) -> str:
     settings = get_settings()
     region = settings.azure_speech_region
     key = settings.azure_speech_key
+    # Comma-separated locales enable at-start language identification on Azure STT.
     url = (
         f"https://{region}.stt.speech.microsoft.com/speech/recognition/conversation/"
         f"cognitiveservices/v1?language={locale}&format=detailed"

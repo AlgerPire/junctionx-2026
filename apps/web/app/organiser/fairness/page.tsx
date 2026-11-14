@@ -42,6 +42,7 @@ export default function FairnessPage() {
       </p>
       <button
         type="button"
+        data-testid="fairness-run"
         disabled={!ready || run.isPending}
         onClick={() => run.mutate()}
         className="mt-4 rounded-xl bg-signal-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
@@ -50,7 +51,7 @@ export default function FairnessPage() {
       </button>
 
       {run.data ? (
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4" data-testid="fairness-result">
           <p className="text-sm">Tested {run.data.n_tested} seekers with approved stories.</p>
           {run.data.dto_leaks.length ? (
             <p className="text-sm text-red-700">DTO leaks: {run.data.dto_leaks.join(", ")}</p>

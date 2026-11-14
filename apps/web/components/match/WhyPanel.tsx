@@ -21,7 +21,7 @@ export function WhyPanel({
   return (
     <div className="fixed inset-0 z-40 flex justify-end bg-signal-ink/30" role="dialog" aria-modal>
       <button className="flex-1 cursor-default" aria-label="Close" onClick={onClose} />
-      <aside className="h-full w-full max-w-md overflow-y-auto bg-signal-foam p-6 shadow-xl">
+      <aside data-testid="why-panel" className="h-full w-full max-w-md overflow-y-auto bg-signal-foam p-6 shadow-xl">
         <div className="mb-4 flex items-start justify-between gap-3">
           <h2 className="font-display text-2xl text-signal-ink">Why this suggestion?</h2>
           <button

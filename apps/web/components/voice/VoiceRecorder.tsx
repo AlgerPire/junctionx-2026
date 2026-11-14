@@ -1,13 +1,21 @@
 "use client";
 
-import { Keyboard, SendHorizontal } from "lucide-react";
+import { Keyboard, Mic, SendHorizontal, Square, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { StatusPill } from "@/components/dashboard/Cards";
+import { LanguageSwitcher } from "@/components/dashboard/LanguageCard";
 import { MicOrb, VoiceStage } from "@/components/dashboard/MicOrb";
+import { ImmersiveOrb } from "@/components/voice/ImmersiveOrb";
 import { apiFetch } from "@/lib/api";
-import { blobToWav, getSpeechRecognition, stopSpeaking } from "@/lib/audio";
-import { getSpeechLang } from "@/lib/speechLang";
+import { blobToWav, getSpeechRecognition, stopSpeaking, unlockAudio } from "@/lib/audio";
+import {
+  getDetectedSpeechLang,
+  getSpeechLangPreference,
+  noteUserLanguageSample,
+  useSpeechLang,
+} from "@/lib/speechLang";
+import { cn } from "@/lib/utils";
 
 type Phase = "idle" | "recording" | "transcribing";
 
@@ -18,11 +26,15 @@ export function VoiceRecorder({
   lang: langProp,
   disabled,
   statusHint,
+  variant = "card",
+  aiState = null,
 }: {
   onTranscript: (text: string) => void;
   lang?: string;
   disabled?: boolean;
   statusHint?: string;
+  variant?: "card" | "immersive";
+  aiState?: "speaking" | "thinking" | null;
 }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [elapsed, setElapsed] = useState(0);
@@ -41,11 +53,8 @@ export function VoiceRecorder({
   const heardSpeechRef = useRef(false);
   const stoppingRef = useRef(false);
   const analyserCleanupRef = useRef<(() => void) | null>(null);
-  const [lang, setLang] = useState(langProp ?? "en-GB");
-
-  useEffect(() => {
-    setLang(langProp ?? getSpeechLang());
-  }, [langProp]);
+  const [sharedLang] = useSpeechLang();
+  const lang = langProp ?? sharedLang;
 
   useEffect(() => {
     return () => {
@@ -136,7 +145,7 @@ export function VoiceRecorder({
       const text = (finalTextRef.current || interimRef.current).trim();
       setLiveCaption("");
       stoppingRef.current = false;
-      if (text) onTranscript(text);
+      if (text) deliverTranscript(text);
       else {
         setError("No speech detected. Hold a bit longer, or type instead.");
         setShowText(true);
@@ -202,12 +211,16 @@ export function VoiceRecorder({
         const wav = await blobToWav(raw);
         const form = new FormData();
         form.append("audio", wav, "take.wav");
-        form.append("lang", lang);
+        // Auto with no sample yet: let cloud STT detect; otherwise pin the resolved lang.
+        const pref = getSpeechLangPreference();
+        const sttLang =
+          pref === "auto" && !getDetectedSpeechLang() ? "auto" : lang;
+        form.append("lang", sttLang);
         const res = await apiFetch<{ text: string }>("/api/voice/transcribe", {
           method: "POST",
           body: form,
         });
-        if (res.text?.trim()) onTranscript(res.text.trim());
+        if (res.text?.trim()) deliverTranscript(res.text);
         else {
           setError("No speech detected. Try again or type instead.");
           setShowText(true);
@@ -228,12 +241,21 @@ export function VoiceRecorder({
 
   async function start() {
     if (disabled || phase !== "idle") return;
+    unlockAudio();
     stopSpeaking();
     setError(null);
     setLiveCaption("");
     try {
-      const ok = await startBrowserRecognition();
-      if (!ok) await startAzureRecording();
+      // Browser SpeechRecognition needs a fixed locale; when Auto hasn't heard
+      // anything yet, use cloud STT so language comes from the audio/text.
+      const autoUnresolved =
+        getSpeechLangPreference() === "auto" && !getDetectedSpeechLang();
+      if (autoUnresolved) {
+        await startAzureRecording();
+      } else {
+        const ok = await startBrowserRecognition();
+        if (!ok) await startAzureRecording();
+      }
     } catch {
       setError("Microphone permission denied. Type instead — that’s fully supported.");
       setShowText(true);
@@ -253,10 +275,18 @@ export function VoiceRecorder({
     mediaRef.current?.stop();
   }
 
+  function deliverTranscript(text: string) {
+    const clean = text.trim();
+    if (!clean) return;
+    noteUserLanguageSample(clean);
+    onTranscript(clean);
+  }
+
   function sendTyped() {
     if (!typed.trim() || disabled) return;
+    unlockAudio();
     stopSpeaking();
-    onTranscript(typed.trim());
+    deliverTranscript(typed);
     setTyped("");
   }
 
@@ -266,12 +296,121 @@ export function VoiceRecorder({
   const statusLabel =
     phase === "recording" ? "Listening" : phase === "transcribing" ? "Transcribing" : statusHint || "Ready";
 
+  const textForm = showText ? (
+    <form
+      className="flex w-full items-center gap-2 rounded-full border border-signal-line bg-white py-1.5 pl-4 pr-1.5 focus-within:border-signal-accent/50"
+      onSubmit={(e) => {
+        e.preventDefault();
+        sendTyped();
+      }}
+    >
+      <input
+        value={typed}
+        onChange={(e) => setTyped(e.target.value)}
+        disabled={busy && !recording}
+        data-testid="voice-text-input"
+        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-signal-muted"
+        placeholder="Type your message…"
+        aria-label="Type your answer"
+      />
+      <button
+        type="submit"
+        aria-label="Send"
+        disabled={busy && !recording}
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-signal-accent text-white transition hover:bg-signal-accentDeep disabled:opacity-40"
+      >
+        <SendHorizontal className="h-4 w-4" />
+      </button>
+    </form>
+  ) : null;
+
+  const langSelect =
+    langProp ? null : (
+      <LanguageSwitcher disabled={recording} menu={variant === "immersive" ? "up" : "down"} />
+    );
+
+  if (variant === "immersive") {
+    const headline = recording
+      ? `Listening · ${elapsed}s`
+      : phase === "transcribing"
+        ? "Turning speech into text…"
+        : aiState === "thinking"
+          ? "Thinking…"
+          : aiState === "speaking"
+            ? "AI is speaking · tap to interrupt"
+            : "Tap the orb to speak";
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-between gap-6">
+        <div className="flex flex-1 flex-col items-center justify-center gap-4">
+          <ImmersiveOrb
+            recording={recording}
+            speaking={aiState === "speaking"}
+            thinking={aiState === "thinking" || phase === "transcribing"}
+            disabled={busy && !recording}
+            onClick={() => (recording ? stop() : void start())}
+            label={recording ? "Stop recording" : "Start recording"}
+          />
+          <p
+            data-testid="voice-status"
+            data-phase={phase}
+            className="flex items-center gap-2 text-sm font-medium text-signal-accent"
+            aria-live="polite"
+          >
+            <Volume2 className="h-4 w-4" aria-hidden />
+            {headline}
+          </p>
+          <p className="min-h-[2.5rem] max-w-md text-center text-sm italic text-signal-muted" aria-live="polite">
+            {liveCaption ? `“${liveCaption}”` : recording ? "" : "Stops automatically when you pause."}
+          </p>
+        </div>
+        <div className="flex w-full max-w-lg flex-col items-center gap-3">
+          <div className="flex items-center gap-3">
+            {langSelect}
+            <button
+              type="button"
+              onClick={() => (recording ? stop() : void start())}
+              disabled={busy && !recording}
+              aria-label={recording ? "Stop recording" : "Start recording"}
+              className={cn(
+                "flex h-14 w-14 items-center justify-center rounded-full border shadow-soft transition disabled:opacity-40",
+                recording
+                  ? "border-transparent bg-signal-teal text-white"
+                  : "border-signal-line bg-white text-signal-accent hover:border-signal-accent/40",
+              )}
+            >
+              {recording ? <Square className="h-5 w-5 fill-current" /> : <Mic className="h-5 w-5" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowText((v) => !v)}
+              aria-label={showText ? "Hide text input" : "Type instead"}
+              aria-pressed={showText}
+              className={cn(
+                "flex h-11 w-11 items-center justify-center rounded-full border transition",
+                showText
+                  ? "border-signal-accent/40 bg-signal-accentSoft text-signal-accent"
+                  : "border-signal-line bg-white text-signal-muted hover:text-signal-accent",
+              )}
+            >
+              <Keyboard className="h-4 w-4" />
+            </button>
+          </div>
+          {textForm}
+          {error ? <p className="text-center text-sm text-signal-warn">{error}</p> : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-6 pt-6">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-[15px] font-bold text-signal-ink">Live voice</h2>
-          <StatusPill label={statusLabel} tone={recording ? "teal" : "purple"} />
+          <div className="flex items-center gap-2">
+            {langSelect}
+            <StatusPill label={statusLabel} tone={recording ? "teal" : "purple"} />
+          </div>
         </div>
       </div>
 
@@ -285,7 +424,7 @@ export function VoiceRecorder({
       </VoiceStage>
 
       <div className="-mt-4 px-6 pb-5 text-center">
-        <p className="text-lg font-bold text-signal-ink">
+        <p data-testid="voice-status" data-phase={phase} className="text-lg font-bold text-signal-ink">
           {recording
             ? `Listening · ${elapsed}s`
             : phase === "transcribing"
@@ -304,32 +443,7 @@ export function VoiceRecorder({
       </div>
 
       <div className="border-t border-signal-line px-6 py-4">
-        {showText ? (
-          <form
-            className="flex items-center gap-2 rounded-full border border-signal-line bg-white py-1.5 pl-4 pr-1.5 focus-within:border-signal-accent/50"
-            onSubmit={(e) => {
-              e.preventDefault();
-              sendTyped();
-            }}
-          >
-            <input
-              value={typed}
-              onChange={(e) => setTyped(e.target.value)}
-              disabled={busy && !recording}
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-signal-muted"
-              placeholder="Type your message…"
-              aria-label="Type your answer"
-            />
-            <button
-              type="submit"
-              aria-label="Send"
-              disabled={busy && !recording}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-signal-accent text-white transition hover:bg-signal-accentDeep disabled:opacity-40"
-            >
-              <SendHorizontal className="h-4 w-4" />
-            </button>
-          </form>
-        ) : null}
+        {textForm}
         <button
           type="button"
           className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-signal-muted hover:text-signal-accent"

@@ -15,7 +15,7 @@ const personas = [
     label: "Nordic Health Data Oy",
     href: "/company",
     icon: Building2,
-    blurb: "Draft hiring briefs by voice, review approaches, keep humans in charge.",
+    blurb: "Draft hiring jobs by voice, review approaches, keep humans in charge.",
     tone: "purple" as const,
   },
   {

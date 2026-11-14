@@ -9,10 +9,20 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session, selectinload
 
 from app.db import get_db
-from app.deps import PersonaContext, resolve_persona, seeker_from_persona, to_seeker_skill_view
-from app.models import Approach, Brief, Company, Seeker, SkillStory, StorySkill
+from app.deps import (
+    PersonaContext,
+    resolve_persona,
+    seeker_from_persona,
+    to_brief_view,
+    to_seeker_skill_view,
+)
+from app.models import Approach, Brief, BriefSkill, Seeker, SkillStory, StorySkill
 from app.schemas import ApproachOut, QueueEstimate, StoryOut, StorySkillOut
 from app.services.audit import write_audit
+from app.services.candidate_pool import company_for_persona
+from app.services.embeddings import skill_index
+from app.services.match_explain import attach_overview
+from app.services.matching import match
 
 router = APIRouter(prefix="/api", tags=["approaches"])
 
@@ -25,7 +35,7 @@ class ApproachDecide(BaseModel):
     decision: str  # accepted | declined
 
 
-def _queue_estimate(db: Session, brief: Brief) -> QueueEstimate:
+def queue_estimate(db: Session, brief: Brief) -> QueueEstimate:
     waiting = db.scalars(
         select(Approach).where(
             Approach.brief_id == brief.id,
@@ -130,7 +140,7 @@ def decide_approach(
     if approach is None:
         raise HTTPException(status_code=404, detail="Approach not found")
 
-    company = db.scalar(select(Company).where(Company.demo_key == persona.id))
+    company = company_for_persona(db, persona.id, persona.company_id)
     if company and approach.brief.company_id != company.id:
         raise HTTPException(status_code=403, detail="Not your inbox")
 
@@ -147,7 +157,7 @@ def decide_approach(
             .values(approach_budget_remaining=Seeker.approach_budget_remaining + 1)
         )
 
-    queue = _queue_estimate(db, approach.brief) if body.decision == "accepted" else None
+    queue = queue_estimate(db, approach.brief) if body.decision == "accepted" else None
     write_audit(
         db,
         actor_role=persona.role,
@@ -176,7 +186,7 @@ def company_inbox(
 ) -> list[dict]:
     if persona.role != "company":
         raise HTTPException(status_code=403, detail="Company persona required")
-    company = db.scalar(select(Company).where(Company.demo_key == persona.id))
+    company = company_for_persona(db, persona.id, persona.company_id)
     if company is None:
         raise HTTPException(status_code=404, detail="Company not found")
 
@@ -186,13 +196,19 @@ def company_inbox(
         .where(Brief.company_id == company.id)
         .options(
             selectinload(Approach.seeker),
-            selectinload(Approach.brief),
+            selectinload(Approach.brief).selectinload(Brief.skills).selectinload(BriefSkill.skill),
         )
         .order_by(Approach.created_at.desc())
     ).all()
 
     out: list[dict] = []
     for a in approaches:
+        view = to_seeker_skill_view(db, a.seeker)
+        sug = None
+        if view is not None:
+            sug, coverage = match(view, to_brief_view(a.brief), skill_index.sim, event_id=a.brief.event_id)
+            if sug is not None:
+                attach_overview(sug, coverage, perspective="company")
         story = db.scalar(
             select(SkillStory)
             .where(SkillStory.seeker_id == a.seeker_id, SkillStory.status == "approved")
@@ -227,6 +243,12 @@ def company_inbox(
                     decided_at=a.decided_at,
                     seeker_alias=a.seeker.alias,
                     brief_title=a.brief.title,
+                    queue_est_minutes=queue_estimate(db, a.brief).est_minutes
+                    if a.status == "accepted"
+                    else None,
+                    seeker_display_name=a.seeker.display_name if a.status == "accepted" else None,
+                    bucket=sug.bucket if sug else None,
+                    fit_summary=sug.fit_summary if sug else None,
                 ),
                 "story": story_out,
             }
@@ -244,4 +266,4 @@ def queue_for_brief(
     brief = db.get(Brief, brief_id)
     if brief is None:
         raise HTTPException(status_code=404, detail="Brief not found")
-    return _queue_estimate(db, brief)
+    return queue_estimate(db, brief)

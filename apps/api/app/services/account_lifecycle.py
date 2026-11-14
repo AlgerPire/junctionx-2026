@@ -16,6 +16,7 @@ from app.models import (
     ConsentRecord,
     Followup,
     InterviewSession,
+    Invite,
     MagicLink,
     Seeker,
     SkillStory,
@@ -70,6 +71,10 @@ def delete_seeker_data(db: Session, seeker: Seeker) -> dict[str, int]:
     for story in db.scalars(select(SkillStory).where(SkillStory.seeker_id == seeker.id)).all():
         db.delete(story)
         counts["stories"] += 1
+    counts["invites"] = 0
+    for invite in db.scalars(select(Invite).where(Invite.seeker_id == seeker.id)).all():
+        db.delete(invite)
+        counts["invites"] += 1
     for approach in db.scalars(select(Approach).where(Approach.seeker_id == seeker.id)).all():
         for fu in db.scalars(select(Followup).where(Followup.approach_id == approach.id)).all():
             db.delete(fu)
@@ -94,6 +99,8 @@ def delete_company_data(db: Session, company: Company, *, drafts_only: bool = Tr
     for brief in briefs:
         if drafts_only and brief.status == "published":
             continue
+        for invite in db.scalars(select(Invite).where(Invite.brief_id == brief.id)).all():
+            db.delete(invite)
         db.delete(brief)
         counts["briefs"] += 1
     owner_keys = [f"company:{company.id}"]

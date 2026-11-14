@@ -128,3 +128,14 @@ export async function applySessionFromMe(me: AuthMe): Promise<void> {
   if (me.session_token) setSessionToken(me.session_token);
   if (me.authenticated && me.auth_mode === "session") clearPersonaId();
 }
+
+/** Revoke the server session (if any) and clear local auth state. */
+export async function logout(): Promise<void> {
+  try {
+    await apiFetch<{ ok: boolean }>("/api/auth/logout", { method: "POST" });
+  } catch {
+    /* still clear local state */
+  }
+  setSessionToken(null);
+  clearPersonaId();
+}

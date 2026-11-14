@@ -40,9 +40,9 @@ def get_brief_summary(db: Session, brief_id: int) -> dict | None:
 
 
 def get_queue_estimate(db: Session, brief: Brief) -> dict:
-    from app.routers.approaches import _queue_estimate
+    from app.routers.approaches import queue_estimate
 
-    est = _queue_estimate(db, brief)
+    est = queue_estimate(db, brief)
     return est.model_dump()
 
 

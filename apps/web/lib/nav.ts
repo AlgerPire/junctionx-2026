@@ -9,8 +9,8 @@ export interface NavItem {
 export const ROLE_NAV: Record<AppRole, NavItem[]> = {
   company: [
     { href: "/company", label: "Dashboard", icon: "home" },
-    { href: "/company/brief/new", label: "New brief", icon: "mic" },
-    { href: "/company/briefs", label: "My briefs", icon: "list" },
+    { href: "/company/brief/new", label: "New job", icon: "mic" },
+    { href: "/company/briefs", label: "My jobs", icon: "list" },
     { href: "/company/inbox", label: "Inbox", icon: "inbox" },
     { href: "/transparency", label: "Transparency", icon: "eye" },
   ],
@@ -36,6 +36,15 @@ export function roleFromPersona(id: string | null): AppRole | null {
   if (id.startsWith("company")) return "company";
   if (id.startsWith("organiser")) return "organiser";
   return null;
+}
+
+/** Keep `candidate` only if it belongs to `role`; otherwise use the role's demo persona. */
+export function personaForRole(role: AppRole, candidate: string | null): string {
+  const candidateRole = roleFromPersona(candidate);
+  if (candidate && candidateRole === role) return candidate;
+  // advisor_demo, admin_demo and dpo_demo use the organiser workspace.
+  if (candidate && role === "organiser" && candidateRole === null) return candidate;
+  return ROLE_META[role].personaDefault;
 }
 
 export const ROLE_META: Record<

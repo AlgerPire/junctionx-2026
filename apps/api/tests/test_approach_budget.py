@@ -1,18 +1,35 @@
 from concurrent.futures import ThreadPoolExecutor
 
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from app.db import SessionLocal
 from app.main import app
-from app.models import Seeker
+from app.models import Approach, Followup, Seeker
 from app.seed import seed
 
 client = TestClient(app)
 
 
+def _clear_approaches(demo_key: str) -> None:
+    db = SessionLocal()
+    try:
+        seeker = db.scalar(select(Seeker).where(Seeker.demo_key == demo_key))
+        assert seeker is not None
+        ids = select(Approach.id).where(Approach.seeker_id == seeker.id)
+        db.execute(delete(Followup).where(Followup.approach_id.in_(ids)))
+        db.execute(delete(Approach).where(Approach.seeker_id == seeker.id))
+        db.commit()
+    finally:
+        db.close()
+
+
 def setup_module() -> None:
     seed()
+
+
+def setup_function() -> None:
+    _clear_approaches("seeker_demo_b")
 
 
 def test_budget_exhausted_returns_409() -> None:

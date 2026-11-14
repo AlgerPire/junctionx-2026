@@ -11,11 +11,13 @@ from app.routers import (
     audit,
     auth,
     briefs,
+    company,
     consent,
     copilot,
     fairness,
     followups,
     interviews,
+    invites,
     organiser,
     personas,
     stories,
@@ -40,6 +42,9 @@ async def lifespan(_: FastAPI):
     # Always ensure schema exists (Railway fresh Postgres).
     try:
         Base.metadata.create_all(bind=engine)
+        from app.seed import ensure_columns
+
+        ensure_columns()
     except Exception:
         pass
     if settings.seed_on_startup:
@@ -97,6 +102,8 @@ app.include_router(consent.router)
 app.include_router(suggestions.router)
 app.include_router(approaches.router)
 app.include_router(briefs.router)
+app.include_router(company.router)
+app.include_router(invites.router)
 app.include_router(stories.router)
 app.include_router(organiser.router)
 app.include_router(fairness.router)
