@@ -357,3 +357,17 @@ function pickVoice(voices: SpeechSynthesisVoice[], lang: string): SpeechSynthesi
   };
   return [...voices].sort((a, b) => score(b) - score(a))[0] ?? null;
 }
+
+const VOICE_MUTE_KEY = "signal_ai_voice_muted";
+
+/** Whether the user previously muted AI spoken replies. */
+export function getVoiceMuted(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(VOICE_MUTE_KEY) === "1";
+}
+
+/** Persist mute so reopening the assistant (or another voice flow) keeps the choice. */
+export function setVoiceMuted(muted: boolean): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(VOICE_MUTE_KEY, muted ? "1" : "0");
+}

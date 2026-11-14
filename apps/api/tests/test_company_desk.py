@@ -101,3 +101,20 @@ def test_fallback_has_no_forced_href() -> None:
     )
     assert reply.action == "none"
     assert reply.href is None
+
+
+def test_off_topic_lists_capabilities() -> None:
+    reply = reply_to_company_ask(
+        "What is the weather in Espoo today?",
+        briefs=BRIEFS,
+        candidates=CANDIDATES,
+        inbox_open=0,
+    )
+    assert reply.action == "none"
+    assert reply.href is None
+    assert "I'm not sure what you are talking about" in reply.answer
+    assert "draft a new hiring job" in reply.answer
+    assert "open candidates for a role" in reply.answer
+    assert "invite someone by alias" in reply.answer
+    assert "check your inbox" in reply.answer
+    assert "open your job list" in reply.answer

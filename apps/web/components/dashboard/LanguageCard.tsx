@@ -211,20 +211,20 @@ export function LanguageCard() {
   const [pref, choose, detected] = useSpeechLangPreference();
 
   return (
-    <section className="glass-card p-5">
+    <section className="glass-card p-4 sm:p-5">
       <div className="flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-signal-accentSoft text-signal-accent">
           <Languages className="h-4 w-4" />
         </span>
         <h2 className="text-[15px] font-bold text-signal-ink">Language</h2>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-1 gap-2.5 sm:mt-4 sm:grid-cols-2 sm:gap-3">
         <button
           type="button"
           onClick={() => choose("auto")}
           aria-pressed={pref === "auto"}
           className={cn(
-            "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition",
+            "flex items-center gap-3 rounded-2xl border px-3.5 py-3 text-left text-sm font-medium transition sm:px-4",
             pref === "auto"
               ? "border-signal-accent/60 bg-signal-accentSoft/60 text-signal-ink"
               : "border-signal-line bg-white text-signal-ink hover:border-signal-accent/30",
@@ -254,7 +254,7 @@ export function LanguageCard() {
               onClick={() => choose(l.code)}
               aria-pressed={active}
               className={cn(
-                "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition",
+                "flex items-center gap-3 rounded-2xl border px-3.5 py-3 text-left text-sm font-medium transition sm:px-4",
                 active
                   ? "border-signal-accent/60 bg-signal-accentSoft/60 text-signal-ink"
                   : "border-signal-line bg-white text-signal-ink hover:border-signal-accent/30",

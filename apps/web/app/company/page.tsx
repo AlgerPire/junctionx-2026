@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Bot, Clock3, FileText, Inbox, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { CompanyAssistantModal } from "@/components/company/CompanyAssistantModal";
@@ -16,7 +17,13 @@ import { COMPANY_CHAT_DEMOS } from "@/lib/companyChatDemo";
 import { useSpeechLang } from "@/lib/speechLang";
 import type { Brief } from "@/lib/types";
 
+function isMobileViewport(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-width: 767px)").matches;
+}
+
 export default function CompanyDashboardPage() {
+  const router = useRouter();
   const [ready, setReady] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [firstMessage, setFirstMessage] = useState<string | undefined>();
@@ -51,7 +58,16 @@ export default function CompanyDashboardPage() {
   function openAssistant(message?: string) {
     // Must run in the click handler so the browser allows later TTS playback.
     unlockAudio();
-    setFirstMessage(message?.trim() || undefined);
+    const first = message?.trim() || undefined;
+
+    // Phones: open as a real page (better layout + browser back). Desktop: modal.
+    if (isMobileViewport()) {
+      const q = first ? `?first=${encodeURIComponent(first)}` : "";
+      router.push(`/company/desk${q}`);
+      return;
+    }
+
+    setFirstMessage(first);
     setAssistantOpen(true);
   }
 
@@ -67,10 +83,10 @@ export default function CompanyDashboardPage() {
       subtitle="Talk through a role, review approaches, keep humans in charge."
       fitViewport
     >
-      <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[1.55fr_1fr]">
+      <div className="grid min-h-0 flex-1 gap-4 md:gap-4 xl:grid-cols-[1.55fr_1fr]">
         <div className="flex min-h-0 flex-col gap-3">
           <section className="glass-card flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-4 sm:px-6 sm:pt-5">
+            <div className="flex flex-col gap-3 px-4 pt-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:px-6 sm:pt-5">
               <div className="min-w-0">
                 <CardHeader
                   title="Hiring assistant"
@@ -80,7 +96,7 @@ export default function CompanyDashboardPage() {
                   Speak or type — I’ll open a job, a candidate profile, an invite, or your inbox.
                 </p>
               </div>
-              <LanguageSwitcher className="shrink-0" />
+              <LanguageSwitcher className="w-full shrink-0 sm:w-auto" />
             </div>
             <div className="group relative flex min-h-0 flex-1 flex-col justify-center">
               <span className="pointer-events-none absolute inset-x-8 top-2 z-10 flex justify-center opacity-0 transition group-hover:opacity-100">
@@ -97,7 +113,7 @@ export default function CompanyDashboardPage() {
                   icon={Bot}
                 />
               </VoiceStage>
-              <p className="-mt-1 px-5 pb-3 text-center text-sm text-signal-muted">
+              <p className="-mt-1 px-4 pb-3 text-center text-sm text-signal-muted sm:px-5">
                 Tap to talk with your hiring assistant
               </p>
             </div>
@@ -111,7 +127,7 @@ export default function CompanyDashboardPage() {
             />
           </section>
 
-          <section className="glass-card shrink-0 px-5 py-3.5 sm:px-6">
+          <section className="glass-card shrink-0 px-4 py-3.5 sm:px-6">
             <CardHeader title="Recent jobs" action={<ViewAll href="/company/briefs" />} />
             <ul className="mt-1 divide-y divide-signal-line">
               {(briefs.data ?? []).slice(0, 4).map((b, i) => (
@@ -143,6 +159,7 @@ export default function CompanyDashboardPage() {
 
       <CompanyAssistantModal
         open={assistantOpen}
+        mode="overlay"
         onClose={closeAssistant}
         firstMessage={firstMessage}
       />

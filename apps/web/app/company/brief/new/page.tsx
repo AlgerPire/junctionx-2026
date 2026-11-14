@@ -125,27 +125,27 @@ export default function NewBriefPage() {
           aria-modal="true"
           aria-label="New job — immersive conversation"
         >
-          <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-8">
-            <div className="flex items-center gap-3">
+          <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-8 sm:py-4">
+            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => {
                   if (typeof window !== "undefined" && window.history.length > 1) router.back();
                   else router.push("/company");
                 }}
-                className="flex items-center gap-1.5 rounded-full border border-signal-line bg-white px-3.5 py-1.5 text-sm font-medium text-signal-ink shadow-soft hover:border-signal-accent/40"
+                className="flex items-center gap-1.5 rounded-full border border-signal-line bg-white px-2.5 py-1.5 text-xs font-medium text-signal-ink shadow-soft hover:border-signal-accent/40 sm:px-3.5 sm:text-sm"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </button>
-              <span className="flex items-center gap-2 rounded-full border border-signal-line bg-white px-3.5 py-1.5 text-sm font-medium text-signal-ink shadow-soft">
+              <span className="flex items-center gap-2 rounded-full border border-signal-line bg-white px-2.5 py-1.5 text-xs font-medium text-signal-ink shadow-soft sm:px-3.5 sm:text-sm">
                 <span
                   className={live ? "h-2 w-2 rounded-full bg-emerald-500" : "h-2 w-2 rounded-full bg-signal-muted"}
                   aria-hidden
                 />
-                {live ? "Live" : interview.status === "done" ? "Ready to review" : "Connecting"}
+                {live ? "Live" : interview.status === "done" ? "Ready" : "…"}
               </span>
-              <span className="rounded-full border border-signal-line bg-white px-3.5 py-1.5 font-mono text-sm font-semibold text-signal-ink/70 shadow-soft">
+              <span className="rounded-full border border-signal-line bg-white px-2.5 py-1.5 font-mono text-xs font-semibold text-signal-ink/70 shadow-soft sm:px-3.5 sm:text-sm">
                 {formatClock(seconds)}
               </span>
             </div>
@@ -157,18 +157,18 @@ export default function NewBriefPage() {
               <button
                 type="button"
                 onClick={() => interview.setMuted((m) => !m)}
-                className="flex items-center gap-1.5 rounded-full border border-signal-line bg-white px-3.5 py-1.5 text-sm font-medium text-signal-ink shadow-soft hover:border-signal-accent/40"
+                className="flex items-center gap-1.5 rounded-full border border-signal-line bg-white px-2.5 py-1.5 text-xs font-medium text-signal-ink shadow-soft hover:border-signal-accent/40 sm:px-3.5 sm:text-sm"
               >
                 {interview.muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                {interview.muted ? "Unmute" : "Mute voice"}
+                <span className="hidden sm:inline">{interview.muted ? "Unmute" : "Mute voice"}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setView("classic")}
-                className="flex items-center gap-1.5 rounded-full border border-signal-line bg-white px-3.5 py-1.5 text-sm font-medium text-signal-ink shadow-soft hover:border-signal-accent/40"
+                className="flex items-center gap-1.5 rounded-full border border-signal-line bg-white px-2.5 py-1.5 text-xs font-medium text-signal-ink shadow-soft hover:border-signal-accent/40 sm:px-3.5 sm:text-sm"
               >
                 <LayoutPanelLeft className="h-4 w-4" />
-                Classic view
+                <span className="hidden sm:inline">Classic view</span>
               </button>
               <Link
                 href="/company"
@@ -180,13 +180,13 @@ export default function NewBriefPage() {
             </div>
           </header>
 
-          <div className="grid flex-1 gap-5 px-5 pb-6 sm:px-8 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)] 2xl:grid-cols-[400px_minmax(0,1fr)_440px]">
+          <div className="grid flex-1 gap-3 px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:gap-5 sm:px-8 sm:pb-6 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)] 2xl:grid-cols-[400px_minmax(0,1fr)_440px]">
             <TranscriptPanel
               messages={interview.messages}
               thinking={thinking}
-              className="order-2 max-h-[28rem] lg:order-1 lg:h-full lg:max-h-none"
+              className="order-2 max-h-[16rem] sm:max-h-[28rem] lg:order-1 lg:h-full lg:max-h-none"
             />
-            <section className="glass-card order-1 flex min-h-[520px] flex-col overflow-hidden p-4 lg:order-2 lg:min-h-0 xl:p-6">
+            <section className="glass-card order-1 flex min-h-[280px] flex-col overflow-hidden p-3 sm:min-h-[520px] sm:p-4 lg:order-2 lg:min-h-0 xl:p-6">
               <VoiceRecorder
                 variant="immersive"
                 aiState={aiState}

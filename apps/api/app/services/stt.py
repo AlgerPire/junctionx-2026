@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import httpx
 
 from app.config import get_settings
@@ -9,7 +11,9 @@ class STTError(Exception):
     pass
 
 
+# Candidate locales for Auto-detect (must be valid Azure STT locales individually).
 _CANDIDATE_LOCALES = ("en-GB", "fi-FI", "sv-SE", "uk-UA")
+_FAST_API_VERSION = "2024-11-15"
 
 
 def _is_auto(lang: str | None) -> bool:
@@ -17,14 +21,21 @@ def _is_auto(lang: str | None) -> bool:
 
 
 def _locale(lang: str | None) -> str:
-    """Resolve a concrete BCP-47 locale, or a comma list for Azure LID when Auto."""
+    """Resolve a single BCP-47 locale for pinned transcription."""
     if _is_auto(lang):
-        return ",".join(_CANDIDATE_LOCALES)
+        return "en-GB"
     cleaned = lang.replace("_", "-").strip()
     if "-" in cleaned:
         return cleaned
     mapping = {"en": "en-GB", "fi": "fi-FI", "sv": "sv-SE", "uk": "uk-UA", "ua": "uk-UA"}
     return mapping.get(cleaned.lower(), "en-GB")
+
+
+def candidate_locales(lang: str | None) -> list[str]:
+    """Locales to send for Auto (LID) vs a single pinned locale."""
+    if _is_auto(lang):
+        return list(_CANDIDATE_LOCALES)
+    return [_locale(lang)]
 
 
 async def transcribe_audio(
@@ -35,11 +46,10 @@ async def transcribe_audio(
     lang: str | None = None,
 ) -> str:
     settings = get_settings()
-    locale = _locale(lang)
     whisper_lang = None if _is_auto(lang) else lang
 
     if settings.stt_provider == "azure" and settings.azure_speech_key:
-        return await _azure_speech(data, content_type=content_type, locale=locale)
+        return await _azure_speech(data, content_type=content_type, lang=lang)
 
     if settings.llm_api_key and settings.llm_provider == "openai":
         return await _openai_whisper(
@@ -54,27 +64,53 @@ async def transcribe_audio(
     raise STTError("Speech-to-text unavailable. Type your answer instead.")
 
 
-async def _azure_speech(data: bytes, *, content_type: str, locale: str) -> str:
+async def _azure_speech(data: bytes, *, content_type: str, lang: str | None) -> str:
+    """
+    Azure short-audio REST `language=` accepts ONE locale only.
+    Auto / multi-locale uses Fast Transcription (locales array + LID).
+    """
+    if _is_auto(lang):
+        try:
+            return await _azure_fast_transcription(
+                data,
+                content_type=content_type,
+                locales=list(_CANDIDATE_LOCALES),
+            )
+        except STTError:
+            # Fall back to a single safe locale if Fast Transcription is unavailable.
+            return await _azure_conversation_stt(
+                data,
+                content_type=content_type,
+                locale="en-GB",
+            )
+    return await _azure_conversation_stt(
+        data,
+        content_type=content_type,
+        locale=_locale(lang),
+    )
+
+
+def _audio_content_type(content_type: str) -> str:
+    ct = (content_type or "").lower()
+    if "wav" in ct:
+        return "audio/wav; codecs=audio/pcm; samplerate=16000"
+    if "webm" in ct:
+        return "audio/webm; codecs=opus"
+    if "mp4" in ct or "m4a" in ct:
+        return "audio/mp4"
+    return content_type or "audio/wav; codecs=audio/pcm; samplerate=16000"
+
+
+async def _azure_conversation_stt(data: bytes, *, content_type: str, locale: str) -> str:
     settings = get_settings()
     region = settings.azure_speech_region
     key = settings.azure_speech_key
-    # Comma-separated locales enable at-start language identification on Azure STT.
+    # Single locale only — comma lists return HTTP 400 Invalid language query parameter.
     url = (
         f"https://{region}.stt.speech.microsoft.com/speech/recognition/conversation/"
         f"cognitiveservices/v1?language={locale}&format=detailed"
     )
-
-    # Prefer WAV/PCM content-type when the client converted audio.
-    ct = (content_type or "").lower()
-    if "wav" in ct or filename_is_wav(content_type):
-        send_type = "audio/wav; codecs=audio/pcm; samplerate=16000"
-    elif "webm" in ct:
-        send_type = "audio/webm; codecs=opus"
-    elif "mp4" in ct or "m4a" in ct:
-        send_type = "audio/mp4"
-    else:
-        send_type = content_type or "audio/wav; codecs=audio/pcm; samplerate=16000"
-
+    send_type = _audio_content_type(content_type)
     headers = {
         "Ocp-Apim-Subscription-Key": key,
         "Accept": "application/json",
@@ -84,7 +120,6 @@ async def _azure_speech(data: bytes, *, content_type: str, locale: str) -> str:
     async with httpx.AsyncClient(timeout=60.0) as client:
         res = await client.post(url, headers=headers, content=data)
         if res.status_code >= 400 and "wav" not in send_type:
-            # Retry as WAV-labelled binary (some browsers send odd mime)
             headers["Content-Type"] = "audio/wav; codecs=audio/pcm; samplerate=16000"
             res = await client.post(url, headers=headers, content=data)
         if res.status_code >= 400:
@@ -103,6 +138,63 @@ async def _azure_speech(data: bytes, *, content_type: str, locale: str) -> str:
                 "Speak a bit longer, or type instead."
             )
         return str(text).strip()
+
+
+async def _azure_fast_transcription(
+    data: bytes,
+    *,
+    content_type: str,
+    locales: list[str],
+) -> str:
+    """
+    Fast Transcription supports multiple locales for language identification.
+    Endpoint: /speechtotext/transcriptions:transcribe
+    """
+    settings = get_settings()
+    region = settings.azure_speech_region
+    key = settings.azure_speech_key
+    url = (
+        f"https://{region}.api.cognitive.microsoft.com/speechtotext/"
+        f"transcriptions:transcribe?api-version={_FAST_API_VERSION}"
+    )
+    definition = json.dumps({"locales": locales})
+    # Prefer filename that matches payload; client usually sends WAV PCM 16k.
+    filename = "audio.wav" if "wav" in (content_type or "").lower() else "audio.bin"
+    mime = _audio_content_type(content_type).split(";")[0].strip() or "application/octet-stream"
+
+    headers = {
+        "Ocp-Apim-Subscription-Key": key,
+        "Accept": "application/json",
+    }
+    files = {
+        "audio": (filename, data, mime),
+        "definition": (None, definition),
+    }
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+        res = await client.post(url, headers=headers, files=files)
+        if res.status_code >= 400:
+            raise STTError(f"Azure Speech HTTP {res.status_code}: {res.text[:200]}")
+        payload = res.json()
+        text = _fast_transcription_text(payload)
+        if not text:
+            raise STTError(
+                "No speech recognised (fast transcription empty). "
+                "Speak a bit longer, or type instead."
+            )
+        return text
+
+
+def _fast_transcription_text(payload: dict) -> str:
+    combined = payload.get("combinedPhrases") or []
+    if combined:
+        parts = [str(p.get("text") or "").strip() for p in combined]
+        joined = " ".join(p for p in parts if p).strip()
+        if joined:
+            return joined
+    phrases = payload.get("phrases") or []
+    parts = [str(p.get("text") or "").strip() for p in phrases]
+    return " ".join(p for p in parts if p).strip()
 
 
 def filename_is_wav(content_type: str) -> bool:

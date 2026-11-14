@@ -274,13 +274,17 @@ def reply_to_company_ask(
             label="Start hiring brief",
         )
 
-    # Fallback: short orientation, no auto-nav forced by vague text
-    parts = [
-        "I can open a new hiring brief, your candidate lists, an invite dialog, or the inbox.",
+    # Off-topic / unclear: stay put and list what this desk can do.
+    capabilities = [
+        "draft a new hiring job",
+        "open candidates for a role",
+        "invite someone by alias",
+        "check your inbox",
+        "open your job list",
     ]
-    if published:
-        parts.append(f"Your latest published brief is {published[0]['title']}.")
-    if inbox_open:
-        parts.append(f"You have {inbox_open} open request(s).")
-    parts.append("What should I open?")
-    return DeskReply(answer=" ".join(parts), action="none")
+    listed = ", ".join(capabilities[:-1]) + f", or {capabilities[-1]}"
+    answer = (
+        "I'm not sure what you are talking about, but I can help you with these things: "
+        f"{listed}."
+    )
+    return DeskReply(answer=answer, action="none")

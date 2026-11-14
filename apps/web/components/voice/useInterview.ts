@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { apiFetch } from "@/lib/api";
-import { speakNatural, stopSpeaking, unlockAudio } from "@/lib/audio";
+import { getVoiceMuted, setVoiceMuted, speakNatural, stopSpeaking, unlockAudio } from "@/lib/audio";
 import { getSpeechLang, noteUserLanguageSample } from "@/lib/speechLang";
 
 type Status = "idle" | "listening" | "transcribing" | "thinking" | "speaking" | "done";
@@ -14,10 +14,26 @@ export function useInterview() {
   const [draft, setDraft] = useState<Record<string, unknown>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMutedState] = useState(false);
   const [briefId, setBriefId] = useState<number | null>(null);
   const [replying, setReplying] = useState(false);
   const speakGen = useRef(0);
+
+  useEffect(() => {
+    setMutedState(getVoiceMuted());
+  }, []);
+
+  const setMuted = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
+    setMutedState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      setVoiceMuted(next);
+      if (next) {
+        speakGen.current += 1;
+        stopSpeaking();
+      }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -26,23 +42,20 @@ export function useInterview() {
     };
   }, []);
 
-  const speak = useCallback(
-    async (text: string) => {
-      if (muted || !text.trim()) return;
-      unlockAudio();
-      const gen = ++speakGen.current;
-      setStatus("speaking");
-      try {
-        await speakNatural(text, getSpeechLang());
-      } catch {
-        /* ignore play errors */
-      }
-      if (speakGen.current === gen) {
-        /* caller sets next status */
-      }
-    },
-    [muted],
-  );
+  const speak = useCallback(async (text: string) => {
+    if (getVoiceMuted() || !text.trim()) return;
+    unlockAudio();
+    const gen = ++speakGen.current;
+    setStatus("speaking");
+    try {
+      await speakNatural(text, getSpeechLang());
+    } catch {
+      /* ignore play errors */
+    }
+    if (speakGen.current === gen) {
+      /* caller sets next status */
+    }
+  }, []);
 
   const runTurn = useCallback(
     async (sid: number, text: string) => {

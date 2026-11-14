@@ -33,12 +33,13 @@ export function StatusPill({ label, tone = "teal" }: { label: string; tone?: Ton
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold",
+        "inline-flex max-w-full items-center gap-1.5 truncate rounded-full px-3 py-1 text-xs font-semibold",
         TILE[tone],
       )}
+      title={label}
     >
-      <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />
-      {label}
+      <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dot)} />
+      <span className="truncate">{label}</span>
     </span>
   );
 }
@@ -51,34 +52,41 @@ export function StatRow({
   compact?: boolean;
 }) {
   return (
-    <div className="grid border-t border-signal-line sm:grid-cols-3 sm:divide-x sm:divide-signal-line">
+    <div className="grid grid-cols-3 border-t border-signal-line divide-x divide-signal-line">
       {stats.map(({ icon: Icon, value, label, tone }) => (
         <div
           key={label}
           className={cn(
-            "flex items-center gap-4",
-            compact ? "px-4 py-3 sm:px-5" : "px-6 py-5",
+            "flex min-w-0 flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:gap-3 sm:text-left",
+            compact ? "px-2 py-3 sm:px-5" : "px-2.5 py-4 sm:px-6 sm:py-5",
           )}
         >
           <span
             className={cn(
-              "flex items-center justify-center rounded-2xl",
+              "flex shrink-0 items-center justify-center rounded-2xl",
               TILE[tone],
-              compact ? "h-10 w-10" : "h-12 w-12",
+              compact ? "h-9 w-9 sm:h-10 sm:w-10" : "h-10 w-10 sm:h-12 sm:w-12",
             )}
           >
-            <Icon className={compact ? "h-4 w-4" : "h-5 w-5"} />
+            <Icon className={compact ? "h-3.5 w-3.5 sm:h-4 sm:w-4" : "h-4 w-4 sm:h-5 sm:w-5"} />
           </span>
-          <div>
+          <div className="min-w-0">
             <p
               className={cn(
                 "font-bold leading-none text-signal-ink",
-                compact ? "text-xl" : "text-2xl",
+                compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl",
               )}
             >
               {value}
             </p>
-            <p className={cn("text-xs text-signal-muted", compact ? "mt-1" : "mt-1.5")}>{label}</p>
+            <p
+              className={cn(
+                "text-[10px] leading-snug text-signal-muted sm:text-xs",
+                compact ? "mt-1" : "mt-1 sm:mt-1.5",
+              )}
+            >
+              {label}
+            </p>
           </div>
         </div>
       ))}
@@ -105,13 +113,17 @@ export function SessionRow({
     <li>
       <Link
         href={href}
-        className="flex items-center gap-4 rounded-2xl px-2 py-3 transition hover:bg-signal-foam"
+        className="flex items-center gap-3 rounded-2xl px-1.5 py-2.5 transition hover:bg-signal-foam sm:gap-4 sm:px-2 sm:py-3"
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-signal-accentSoft text-signal-accent">
-          <Play className="ml-0.5 h-4 w-4 fill-current" />
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-signal-accentSoft text-signal-accent sm:h-10 sm:w-10">
+          <Play className="ml-0.5 h-3.5 w-3.5 fill-current sm:h-4 sm:w-4" />
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-signal-ink">{title}</p>
+          <p className="mt-0.5 truncate text-[11px] text-signal-muted sm:hidden">
+            {meta}
+            {date ? ` · ${date}` : ""}
+          </p>
           <VoiceWave
             bars={28}
             tone={WAVE_TONES[index % WAVE_TONES.length]}
@@ -122,7 +134,7 @@ export function SessionRow({
         </div>
         <span className="hidden w-20 text-right text-sm text-signal-muted sm:block">{meta}</span>
         <span className="hidden w-32 text-right text-sm text-signal-muted lg:block">{date}</span>
-        <MoreVertical className="h-4 w-4 shrink-0 text-signal-muted" />
+        <MoreVertical className="hidden h-4 w-4 shrink-0 text-signal-muted sm:block" />
       </Link>
     </li>
   );

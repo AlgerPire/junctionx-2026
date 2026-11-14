@@ -28,12 +28,15 @@ export function VoiceRecorder({
   statusHint,
   variant = "card",
   aiState = null,
+  embedded = false,
 }: {
   onTranscript: (text: string) => void;
   lang?: string;
   disabled?: boolean;
   statusHint?: string;
   variant?: "card" | "immersive";
+  /** Skip the outer glass card when already wrapped by a parent. */
+  embedded?: boolean;
   aiState?: "speaking" | "thinking" | null;
 }) {
   const [phase, setPhase] = useState<Phase>("idle");
@@ -293,8 +296,17 @@ export function VoiceRecorder({
   const recording = phase === "recording";
   const busy = phase === "transcribing" || disabled;
 
+  // Keep the pill short — long hints wrap and leak on narrow screens.
   const statusLabel =
-    phase === "recording" ? "Listening" : phase === "transcribing" ? "Transcribing" : statusHint || "Ready";
+    phase === "recording"
+      ? "Listening"
+      : phase === "transcribing"
+        ? "Transcribing"
+        : aiState === "thinking"
+          ? "Thinking"
+          : aiState === "speaking"
+            ? "Speaking"
+            : "Ready";
 
   const textForm = showText ? (
     <form
@@ -403,18 +415,18 @@ export function VoiceRecorder({
   }
 
   return (
-    <div className="glass-card overflow-hidden">
-      <div className="px-6 pt-6">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-[15px] font-bold text-signal-ink">Live voice</h2>
-          <div className="flex items-center gap-2">
+    <div className={cn(embedded ? "overflow-hidden" : "glass-card overflow-hidden")}>
+      <div className={cn(embedded ? "px-3 pt-3 sm:px-4 sm:pt-4" : "px-6 pt-6")}>
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <h2 className="shrink-0 text-[15px] font-bold text-signal-ink">Live voice</h2>
+          <div className="flex min-w-0 items-center gap-2">
             {langSelect}
             <StatusPill label={statusLabel} tone={recording ? "teal" : "purple"} />
           </div>
         </div>
       </div>
 
-      <VoiceStage active={recording}>
+      <VoiceStage active={recording} compact={embedded}>
         <MicOrb
           recording={recording}
           disabled={busy && !recording}
@@ -423,8 +435,12 @@ export function VoiceRecorder({
         />
       </VoiceStage>
 
-      <div className="-mt-4 px-6 pb-5 text-center">
-        <p data-testid="voice-status" data-phase={phase} className="text-lg font-bold text-signal-ink">
+      <div className={cn("-mt-2 text-center", embedded ? "px-3 pb-3 sm:px-4" : "-mt-4 px-6 pb-5")}>
+        <p
+          data-testid="voice-status"
+          data-phase={phase}
+          className={cn("font-bold text-signal-ink", embedded ? "text-base" : "text-lg")}
+        >
           {recording
             ? `Listening · ${elapsed}s`
             : phase === "transcribing"
@@ -437,16 +453,21 @@ export function VoiceRecorder({
           </p>
         ) : (
           <p className="mx-auto mt-1 max-w-sm text-sm text-signal-muted">
-            Tap the mic to interrupt. Stops automatically when you pause.
+            {statusHint || "Tap the mic to interrupt. Stops automatically when you pause."}
           </p>
         )}
       </div>
 
-      <div className="border-t border-signal-line px-6 py-4">
+      <div
+        className={cn(
+          "border-t border-signal-line",
+          embedded ? "px-3 py-3 sm:px-4" : "px-6 py-4",
+        )}
+      >
         {textForm}
         <button
           type="button"
-          className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-signal-muted hover:text-signal-accent"
+          className="mt-2 inline-flex items-center gap-2 text-xs font-medium text-signal-muted hover:text-signal-accent sm:mt-3"
           onClick={() => setShowText((v) => !v)}
         >
           <Keyboard className="h-3.5 w-3.5" />

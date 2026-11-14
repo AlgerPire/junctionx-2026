@@ -86,7 +86,7 @@ export default function HomePage() {
               Accessibility
             </Link>
             <Link
-              href="/transparency"
+              href="/how-it-works"
               className="text-sm font-semibold text-signal-muted transition hover:text-signal-accent"
             >
               How it works

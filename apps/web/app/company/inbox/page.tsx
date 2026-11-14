@@ -83,7 +83,7 @@ export default function CompanyInboxPage() {
       title="Inbox"
       subtitle="Conversation requests from jobseekers and the interview invitations you sent. You decide."
     >
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
         {[
           { icon: Inbox, label: "Waiting for your answer", value: counts.requests },
           { icon: MailCheck, label: "Agreed conversations", value: counts.agreed },
@@ -94,40 +94,42 @@ export default function CompanyInboxPage() {
             value: `${Math.max(0, ...agreedRequests.map((i) => i.approach.queue_est_minutes ?? 0))} min`,
           },
         ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="glass-card flex items-center gap-3 px-4 py-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-signal-accentSoft text-signal-accent">
-              <Icon className="h-5 w-5" />
+          <div key={label} className="glass-card flex min-w-0 items-center gap-2.5 px-3 py-3.5 sm:gap-3 sm:px-4 sm:py-4">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-signal-accentSoft text-signal-accent sm:h-10 sm:w-10">
+              <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
             </span>
-            <div>
-              <p className="text-xl font-bold leading-none text-signal-ink">{value}</p>
-              <p className="mt-1 text-xs text-signal-muted">{label}</p>
+            <div className="min-w-0">
+              <p className="text-lg font-bold leading-none text-signal-ink sm:text-xl">{value}</p>
+              <p className="mt-1 text-[11px] leading-snug text-signal-muted sm:text-xs">{label}</p>
             </div>
           </div>
         ))}
       </section>
 
-      <div className="mt-6 flex flex-wrap gap-1.5 rounded-2xl bg-white p-1 shadow-soft sm:inline-flex">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            className={cn(
-              "flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition",
-              tab === t.id ? "bg-signal-accent text-white" : "text-signal-muted hover:text-signal-ink",
-            )}
-          >
-            {t.label}
-            <span
+      <div className="mt-5 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:mt-6 sm:overflow-visible sm:px-0">
+        <div className="flex w-max min-w-full gap-1.5 rounded-2xl bg-white p-1 shadow-soft sm:inline-flex sm:w-auto sm:min-w-0 sm:flex-wrap">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTab(t.id)}
               className={cn(
-                "rounded-full px-1.5 text-xs",
-                tab === t.id ? "bg-white/25" : "bg-signal-foam text-signal-muted",
+                "flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-3.5",
+                tab === t.id ? "bg-signal-accent text-white" : "text-signal-muted hover:text-signal-ink",
               )}
             >
-              {counts[t.id]}
-            </span>
-          </button>
-        ))}
+              {t.label}
+              <span
+                className={cn(
+                  "rounded-full px-1.5 text-xs",
+                  tab === t.id ? "bg-white/25" : "bg-signal-foam text-signal-muted",
+                )}
+              >
+                {counts[t.id]}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mt-5 grid gap-4">
@@ -210,13 +212,13 @@ function RequestCard({
   const shown = showAll ? skills : skills.slice(0, 3);
 
   return (
-    <article className="glass-card p-5" data-testid="inbox-request" data-seeker-alias={a.seeker_alias}>
+    <article className="glass-card p-4 sm:p-5" data-testid="inbox-request" data-seeker-alias={a.seeker_alias}>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-signal-muted">
             Asked to talk · {formatShortDate(a.created_at)}
           </p>
-          <h2 className="mt-1 text-lg font-bold text-signal-ink">
+          <h2 className="mt-1 text-base font-bold leading-snug text-signal-ink sm:text-lg">
             {a.seeker_display_name ?? a.seeker_alias}
             <span className="font-normal text-signal-muted"> → </span>
             <Link href={`/company/briefs/${a.brief_id}`} className="text-signal-accent hover:underline">
@@ -264,7 +266,7 @@ function RequestCard({
         </button>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {a.status === "requested" && onDecide ? (
           <>
             <button
@@ -272,7 +274,7 @@ function RequestCard({
               data-testid="inbox-accept"
               disabled={busy}
               onClick={() => onDecide("accepted")}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-signal-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-signal-accent px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto sm:py-2"
             >
               <Check className="h-4 w-4" /> Accept conversation
             </button>
@@ -280,7 +282,7 @@ function RequestCard({
               type="button"
               disabled={busy}
               onClick={() => onDecide("declined")}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-signal-line bg-white px-4 py-2 text-sm text-signal-ink disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-signal-line bg-white px-4 py-2.5 text-sm text-signal-ink disabled:opacity-50 sm:w-auto sm:py-2"
             >
               <X className="h-4 w-4" /> Decline
             </button>

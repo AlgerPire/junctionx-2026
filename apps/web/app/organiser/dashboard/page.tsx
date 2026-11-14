@@ -69,10 +69,10 @@ export default function OrganiserDashboardPage() {
       title="Organiser dashboard"
       subtitle="Aggregated supply gaps and event health — never individual profiling."
     >
-      <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-        <div className="space-y-6">
+      <div className="grid gap-4 sm:gap-6 xl:grid-cols-[1.6fr_1fr]">
+        <div className="space-y-4 sm:space-y-6">
           <section className="glass-card overflow-hidden">
-            <div className="px-6 pt-6">
+            <div className="px-4 pt-4 sm:px-6 sm:pt-6">
               <CardHeader title="Live event pulse" action={<StatusPill label="Active" />} />
             </div>
             <VoiceStage active>
@@ -97,14 +97,16 @@ export default function OrganiserDashboardPage() {
             />
           </section>
 
-          <section className="glass-card p-6">
+          <section className="glass-card p-4 sm:p-6">
             <CardHeader
               title="Supply-gap radar"
-              action={<span className="text-xs text-signal-muted">Small cells suppressed</span>}
+              action={<span className="hidden text-xs text-signal-muted sm:inline">Small cells suppressed</span>}
             />
-            <div className="mt-4">
+            <div className="mt-4 -mx-1 overflow-x-auto sm:mx-0">
               {gap.data ? (
-                <SupplyGapChart rows={gap.data} />
+                <div className="min-w-[280px]">
+                  <SupplyGapChart rows={gap.data} />
+                </div>
               ) : (
                 <p className="text-sm text-signal-muted">Loading chart…</p>
               )}
@@ -112,27 +114,27 @@ export default function OrganiserDashboardPage() {
           </section>
         </div>
 
-        <div className="flex flex-col gap-6">
-          <section className="glass-card p-5">
+        <div className="flex flex-col gap-4 sm:gap-6">
+          <section className="glass-card p-4 sm:p-5">
             <h2 className="text-[15px] font-bold text-signal-ink">Quick actions</h2>
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-4 sm:gap-3">
               <QuickAction href="/organiser/fairness" icon={Shield} label="Bias Mirror" />
               <QuickAction href="/transparency" icon={Eye} label="Transparency" />
               <button
                 type="button"
                 onClick={exportCsv}
-                className="flex items-center gap-3 rounded-2xl border border-signal-line px-4 py-3 text-left text-sm font-medium text-signal-ink transition hover:border-signal-accent/30"
+                className="flex items-center gap-2.5 rounded-2xl border border-signal-line px-3 py-3 text-left text-sm font-medium text-signal-ink transition hover:border-signal-accent/30 sm:gap-3 sm:px-4"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-signal-skySoft text-signal-sky">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-signal-skySoft text-signal-sky">
                   <Download className="h-3.5 w-3.5" />
                 </span>
-                Export CSV
+                <span className="leading-snug">Export CSV</span>
               </button>
               <QuickAction href="/organiser/supply-gap" icon={Radar} label="Supply gap" />
             </div>
           </section>
 
-          <section className="glass-card flex-1 p-5">
+          <section className="glass-card flex-1 p-4 sm:p-5">
             <h2 className="text-[15px] font-bold text-signal-ink">Top uncovered needs</h2>
             <ul className="mt-3 divide-y divide-signal-line">
               {gap.data?.slice(0, 5).map((r) => (
@@ -141,7 +143,7 @@ export default function OrganiserDashboardPage() {
                     <span className="block truncate font-medium text-signal-ink">{r.skill}</span>
                     <span className="text-xs text-signal-muted">{r.cluster}</span>
                   </span>
-                  <span className="rounded-full bg-signal-accentSoft px-2.5 py-1 text-xs font-semibold text-signal-accent">
+                  <span className="shrink-0 rounded-full bg-signal-accentSoft px-2.5 py-1 text-xs font-semibold text-signal-accent">
                     gap {r.gap}
                   </span>
                 </li>
@@ -176,12 +178,12 @@ function QuickAction({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 rounded-2xl border border-signal-line px-4 py-3 text-sm font-medium text-signal-ink transition hover:border-signal-accent/30"
+      className="flex items-center gap-2.5 rounded-2xl border border-signal-line px-3 py-3 text-sm font-medium text-signal-ink transition hover:border-signal-accent/30 sm:gap-3 sm:px-4"
     >
-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-signal-accentSoft text-signal-accent">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-signal-accentSoft text-signal-accent">
         <Icon className="h-3.5 w-3.5" />
       </span>
-      {label}
+      <span className="leading-snug">{label}</span>
     </Link>
   );
 }

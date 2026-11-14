@@ -187,7 +187,12 @@ export function ChatPreview({
   const showLive = Boolean(demo) && !demoCleared;
 
   return (
-    <section className={cn("glass-card flex min-h-0 flex-1 flex-col p-5", className)}>
+    <section
+      className={cn(
+        "glass-card flex min-h-[22rem] flex-1 flex-col p-4 sm:min-h-0 sm:p-5",
+        className,
+      )}
+    >
       <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-signal-muted">
           {showLive ? "Live demo" : demoCleared ? "Ask anything" : "Preview"}
@@ -203,7 +208,7 @@ export function ChatPreview({
       <div
         ref={listRef}
         className={cn(
-          "min-h-0 flex-1 space-y-4 overflow-y-auto pr-1 transition-opacity duration-[400ms]",
+          "min-h-[14rem] flex-1 space-y-3 overflow-y-auto pr-1 transition-opacity duration-[400ms] sm:min-h-0 sm:space-y-4",
           fading && "opacity-0",
         )}
       >

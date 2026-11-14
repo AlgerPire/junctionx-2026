@@ -9,7 +9,7 @@ export function PageWaves({
   const seeker = variant === "seeker";
   const organiser = variant === "organiser";
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 overflow-hidden" aria-hidden>
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 overflow-hidden sm:h-44" aria-hidden>
       <svg
         viewBox="0 0 1440 200"
         preserveAspectRatio="none"
@@ -82,12 +82,12 @@ export function FooterNote({
     <p
       className={
         compact
-          ? "relative z-10 flex shrink-0 items-center justify-center gap-2 px-4 pb-3 pt-2 text-xs text-signal-muted"
-          : "relative z-10 flex items-center justify-center gap-2 pb-6 pt-10 text-sm text-signal-muted"
+          ? "relative z-10 flex shrink-0 items-center justify-center gap-2 px-4 pb-3 pt-2 text-center text-xs text-signal-muted"
+          : "relative z-10 flex items-center justify-center gap-2 px-4 pb-6 pt-8 text-center text-sm text-signal-muted sm:pt-10"
       }
     >
       <Sparkles className="h-4 w-4 shrink-0 text-signal-accent" />
-      {children}
+      <span className="max-w-md">{children}</span>
     </p>
   );
 }

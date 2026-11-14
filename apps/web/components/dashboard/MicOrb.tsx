@@ -100,8 +100,8 @@ export function VoiceStage({
   return (
     <div
       className={cn(
-        "relative flex w-full items-center justify-center gap-10",
-        compact ? "py-4" : "py-10",
+        "relative flex w-full items-center justify-center gap-4 sm:gap-10",
+        compact ? "py-3 sm:py-4" : "py-6 sm:py-10",
       )}
     >
       <span className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-signal-accent/15" />

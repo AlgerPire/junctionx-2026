@@ -9,6 +9,7 @@ export interface NavItem {
 export const ROLE_NAV: Record<AppRole, NavItem[]> = {
   company: [
     { href: "/company", label: "Dashboard", icon: "home" },
+    { href: "/company/desk", label: "Assistant", icon: "bot" },
     { href: "/company/brief/new", label: "New job", icon: "mic" },
     { href: "/company/briefs", label: "My jobs", icon: "list" },
     { href: "/company/inbox", label: "Inbox", icon: "inbox" },
