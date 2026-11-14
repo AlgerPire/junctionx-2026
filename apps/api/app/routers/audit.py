@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from pydantic import BaseModel
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -12,34 +13,55 @@ from app.services.audit import write_audit
 router = APIRouter(prefix="/api", tags=["audit"])
 
 
-@router.get("/audit", response_model=list[AuditEntryOut])
+class AuditPageOut(BaseModel):
+    items: list[AuditEntryOut]
+    total: int
+    limit: int
+    offset: int
+
+
+@router.get("/audit", response_model=AuditPageOut)
 def list_audit(
     actor: str | None = None,
     action: str | None = None,
-    limit: int = Query(default=50, le=200),
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
     persona: PersonaContext = Depends(resolve_persona),
-) -> list[AuditEntryOut]:
+) -> AuditPageOut:
     # Demo and staff can browse; seekers/companies only see their own rows when authenticated.
-    stmt = select(AuditLog).order_by(AuditLog.ts.desc()).limit(limit)
+    filters = []
     if persona.role in {"seeker", "company"} and persona.auth_mode == "session":
-        stmt = stmt.where(AuditLog.actor_id == persona.id)
+        filters.append(AuditLog.actor_id == persona.id)
     if actor:
-        stmt = stmt.where(AuditLog.actor_id == actor)
+        filters.append(AuditLog.actor_id == actor)
     if action:
-        stmt = stmt.where(AuditLog.action == action)
-    rows = db.scalars(stmt).all()
-    return [
-        AuditEntryOut(
-            id=r.id,
-            ts=r.ts,
-            actor_role=r.actor_role,
-            actor_id=r.actor_id,
-            action=r.action,
-            payload=r.payload or {},
-        )
-        for r in rows
-    ]
+        filters.append(AuditLog.action == action)
+
+    count_stmt = select(func.count()).select_from(AuditLog)
+    stmt = select(AuditLog).order_by(AuditLog.ts.desc())
+    for f in filters:
+        count_stmt = count_stmt.where(f)
+        stmt = stmt.where(f)
+
+    total = int(db.scalar(count_stmt) or 0)
+    rows = db.scalars(stmt.offset(offset).limit(limit)).all()
+    return AuditPageOut(
+        items=[
+            AuditEntryOut(
+                id=r.id,
+                ts=r.ts,
+                actor_role=r.actor_role,
+                actor_id=r.actor_id,
+                action=r.action,
+                payload=r.payload or {},
+            )
+            for r in rows
+        ],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.post("/me/delete")

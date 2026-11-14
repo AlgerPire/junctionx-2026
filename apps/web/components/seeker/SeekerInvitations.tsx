@@ -34,49 +34,49 @@ export function SeekerInvitations({ enabled }: { enabled: boolean }) {
   const pending = items.filter((i) => i.status === "invited").length;
 
   return (
-    <section className="mb-6">
-      <h2 className="flex items-center gap-2 text-lg font-bold text-signal-ink">
-        <MailOpen className="h-5 w-5 text-signal-accent" /> Interview invitations
+    <section>
+      <div className="mb-3 flex items-center gap-2">
+        <MailOpen className="h-4 w-4 text-signal-accent" />
+        <h2 className="text-sm font-bold text-signal-ink">Invitations</h2>
         {pending ? (
-          <span className="rounded-full bg-signal-accent px-2 py-0.5 text-xs font-semibold text-white">
-            {pending} new
+          <span className="rounded-full bg-signal-accent px-2 py-0.5 text-[11px] font-semibold text-white">
+            {pending}
           </span>
         ) : null}
-      </h2>
-      <p className="mt-1 text-sm text-signal-muted">
-        Companies saw only your alias and approved evidence. Your name is shared only if you accept.
-      </p>
-      <div className="mt-3 grid gap-3">
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
         {items.map((inv) => (
           <article
             key={inv.id}
-            className={cn("glass-card p-4", inv.status === "invited" && "border-signal-accent/40")}
+            className={cn(
+              "rounded-[20px] border border-signal-line/80 bg-white p-4 shadow-soft",
+              inv.status === "invited" && "border-signal-accent/40",
+            )}
           >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-signal-accent">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-xs font-semibold uppercase tracking-wide text-signal-accent">
                   {inv.company_name}
                 </p>
-                <h3 className="text-base font-bold text-signal-ink">{inv.brief_title}</h3>
+                <h3 className="mt-0.5 truncate text-sm font-bold text-signal-ink">{inv.brief_title}</h3>
               </div>
-              <span className="text-xs text-signal-muted">{formatShortDate(inv.created_at)}</span>
+              <span className="shrink-0 text-[11px] text-signal-muted">
+                {formatShortDate(inv.created_at)}
+              </span>
             </div>
-            {inv.message ? (
-              <p className="mt-2 rounded-2xl bg-signal-foam px-3 py-2 text-sm text-signal-ink/80">{inv.message}</p>
-            ) : null}
             {inv.proposed_slot ? (
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-signal-ink/80">
-                <CalendarClock className="h-4 w-4 text-signal-accent" /> {inv.proposed_slot}
+              <p className="mt-2 flex items-center gap-1.5 text-xs text-signal-ink/75">
+                <CalendarClock className="h-3.5 w-3.5 text-signal-accent" /> {inv.proposed_slot}
               </p>
             ) : null}
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="mt-3 flex gap-2">
               {inv.status === "invited" ? (
                 <>
                   <button
                     type="button"
                     disabled={respond.isPending}
                     onClick={() => respond.mutate({ id: inv.id, decision: "accepted" })}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-signal-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-signal-accent px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
                   >
                     <Check className="h-4 w-4" /> Accept
                   </button>
@@ -84,14 +84,13 @@ export function SeekerInvitations({ enabled }: { enabled: boolean }) {
                     type="button"
                     disabled={respond.isPending}
                     onClick={() => respond.mutate({ id: inv.id, decision: "declined" })}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-signal-line bg-white px-4 py-2 text-sm disabled:opacity-50"
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-signal-line bg-white px-3 py-2 text-sm disabled:opacity-50"
                   >
                     <X className="h-4 w-4" /> Decline
                   </button>
-                  <span className="text-xs text-signal-muted">Declining has no effect on other suggestions.</span>
                 </>
               ) : (
-                <span className="text-sm text-signal-muted">{STATUS_TEXT[inv.status]}</span>
+                <span className="text-xs text-signal-muted">{STATUS_TEXT[inv.status]}</span>
               )}
             </div>
           </article>

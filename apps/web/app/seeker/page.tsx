@@ -1,12 +1,23 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BadgeCheck, MessagesSquare, Mic2, Ticket } from "lucide-react";
+import {
+  ArrowRight,
+  AudioLines,
+  BadgeCheck,
+  EyeOff,
+  MessagesSquare,
+  Mic2,
+  PencilLine,
+  ShieldCheck,
+  Sparkles,
+  Ticket,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { CopilotChat } from "@/components/copilot/CopilotChat";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { LanguageCard } from "@/components/dashboard/LanguageCard";
 import { apiFetch, getPersonaId, setPersonaId } from "@/lib/api";
 import type { SuggestionsResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -15,6 +26,7 @@ const BUCKET_LABEL = { strong: "Strong", good: "Good", explore: "Explore" } as c
 
 export default function SeekerDashboardPage() {
   const [ready, setReady] = useState(false);
+
   useEffect(() => {
     setPersonaId(
       new URLSearchParams(window.location.search).get("persona") ??
@@ -42,199 +54,279 @@ export default function SeekerDashboardPage() {
   const storyStatus = story.data?.status;
   const skillCount = story.data?.skills?.length ?? 0;
   const profileReady = storyStatus === "approved";
+  const skills = story.data?.skills ?? [];
 
   return (
     <DashboardShell
       role="seeker"
       title="Your space"
-      subtitle="Complete your skill story, then choose conversations that fit — on your terms."
+      subtitle="Story, conversations, and a private AI helper — you decide."
     >
-      <section className="relative overflow-hidden rounded-[22px] border border-signal-line/60 bg-white shadow-soft sm:rounded-[28px]">
-        <div className="grid lg:grid-cols-[1.55fr_1fr]">
-          <div className="relative overflow-hidden px-4 py-6 sm:px-8 sm:py-9">
+      <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+        <section className="glass-card overflow-hidden">
+          <div className="relative overflow-hidden px-4 py-5 sm:px-6 sm:py-6">
             <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_0%_0%,rgba(47,91,184,0.14),transparent_55%),radial-gradient(ellipse_50%_60%_at_100%_100%,rgba(74,120,214,0.10),transparent_50%)]"
+              className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full bg-signal-accent/10 blur-2xl"
               aria-hidden
             />
-            <div className="relative">
-              <p className="inline-flex items-center gap-2 rounded-xl bg-signal-accentSoft px-3 py-1 text-xs font-semibold text-signal-accent">
-                <Mic2 className="h-3.5 w-3.5" />
-                Profile progress
-              </p>
-              <h2 className="mt-3 max-w-xl text-2xl font-extrabold tracking-tight text-signal-ink sm:mt-4 sm:text-[2.1rem] sm:leading-tight">
-                {profileReady
-                  ? "Your story is shared — pick conversations"
-                  : skillCount
-                    ? "Review and approve your skills"
-                    : "Start with your voice"}
-              </h2>
-              <p className="mt-2 max-w-md text-sm leading-relaxed text-signal-muted sm:mt-3 sm:text-base">
-                {profileReady
-                  ? "Companies only see your alias and approved evidence. You decide whom to contact."
-                  : "A short AI interview asks about real situations. Type or speak — captions stay on."}
-              </p>
-              <div className="mt-5 flex flex-col gap-2.5 sm:mt-7 sm:flex-row sm:flex-wrap sm:gap-3">
-                <Link
-                  href={profileReady ? "/seeker/event" : "/seeker/story?new=1"}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-signal-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-signal-accentDeep"
+            <div
+              className="pointer-events-none absolute -bottom-12 left-1/3 h-32 w-32 rounded-full bg-signal-sky/15 blur-2xl"
+              aria-hidden
+            />
+
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+              <div className="relative mx-auto shrink-0 sm:mx-0">
+                <span className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-gradient-to-br from-signal-accent to-signal-accentDeep text-white shadow-orb sm:h-[4.5rem] sm:w-[4.5rem]">
+                  {profileReady ? (
+                    <ShieldCheck className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.8} />
+                  ) : skillCount ? (
+                    <PencilLine className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.8} />
+                  ) : (
+                    <Mic2 className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.8} />
+                  )}
+                </span>
+                <span
+                  className={cn(
+                    "absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-white shadow-soft",
+                    profileReady ? "bg-signal-teal" : skillCount ? "bg-signal-sky" : "bg-signal-accent",
+                  )}
                 >
-                  {profileReady ? "Open conversations" : "Complete skill story"}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/seeker/story"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-signal-line bg-white px-5 py-3 text-sm font-semibold text-signal-ink hover:bg-signal-foam"
-                >
-                  Open studio
-                </Link>
+                  {profileReady ? (
+                    <BadgeCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <AudioLines className="h-3.5 w-3.5" />
+                  )}
+                </span>
+              </div>
+
+              <div className="min-w-0 flex-1 text-center sm:text-left">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                  <p className="inline-flex items-center gap-1.5 rounded-full bg-signal-accentSoft px-2.5 py-1 text-[11px] font-semibold text-signal-accent">
+                    <Sparkles className="h-3 w-3" />
+                    Skill story
+                  </p>
+                  <p
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
+                      profileReady
+                        ? "bg-signal-tealSoft text-signal-teal"
+                        : skillCount
+                          ? "bg-signal-skySoft text-signal-sky"
+                          : "bg-signal-foam text-signal-muted",
+                    )}
+                  >
+                    {profileReady ? (
+                      <>
+                        <BadgeCheck className="h-3 w-3" />
+                        Shared
+                      </>
+                    ) : skillCount ? (
+                      <>
+                        <PencilLine className="h-3 w-3" />
+                        Needs review
+                      </>
+                    ) : (
+                      <>
+                        <Mic2 className="h-3 w-3" />
+                        Not started
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                <h2 className="mt-2.5 text-xl font-extrabold tracking-tight text-signal-ink sm:text-2xl">
+                  {profileReady
+                    ? "Your story is ready"
+                    : skillCount
+                      ? "Review before you share"
+                      : "Tell your skill story"}
+                </h2>
+                <p className="mt-1.5 max-w-md text-sm leading-relaxed text-signal-muted sm:mx-0 mx-auto">
+                  {profileReady
+                    ? "Evidence-backed skills only — companies never see your name here."
+                    : "A short voice or text chat. Captions stay on. You approve every skill."}
+                </p>
+
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-start">
+                  <Link
+                    href={profileReady ? "/seeker/event" : "/seeker/story?new=1"}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-signal-accent px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-signal-accentDeep"
+                  >
+                    {profileReady ? (
+                      <>
+                        <MessagesSquare className="h-4 w-4" />
+                        Find conversations
+                      </>
+                    ) : (
+                      <>
+                        <Mic2 className="h-4 w-4" />
+                        {skillCount ? "Continue story" : "Start interview"}
+                      </>
+                    )}
+                    <ArrowRight className="h-4 w-4 opacity-80" />
+                  </Link>
+                  <Link
+                    href="/seeker/story"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-signal-line bg-white/90 px-4 py-2.5 text-sm font-semibold text-signal-ink transition hover:border-signal-accent/35 hover:bg-signal-foam"
+                  >
+                    <PencilLine className="h-4 w-4 text-signal-accent" />
+                    Open studio
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="seeker-story-hero flex flex-col justify-between gap-5 px-4 py-6 text-white sm:gap-6 sm:px-7 sm:py-9">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/75">
-                Story status
-              </p>
-              <p className="mt-2 text-2xl font-bold leading-snug">
-                {storyStatus === "approved"
-                  ? "Shared with companies"
-                  : storyStatus
-                    ? "Draft — awaiting approval"
-                    : "Not started yet"}
-              </p>
-              <p className="mt-2 text-sm text-white/80">
-                Matching never uses name, nationality, age, gender, school, photo or address.
-              </p>
-            </div>
-            {story.data?.skills?.length ? (
-              <ul className="flex flex-wrap gap-2">
-                {story.data.skills.slice(0, 5).map((s) => (
-                  <li
-                    key={s.label}
-                    className="rounded-xl border border-white/25 bg-white/15 px-3 py-1.5 text-xs font-semibold"
-                  >
-                    {s.label}
-                  </li>
-                ))}
-                {skillCount > 5 ? (
-                  <li className="rounded-xl border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold">
-                    +{skillCount - 5} more
-                  </li>
-                ) : null}
-              </ul>
+            {skills.length ? (
+              <div className="relative mt-5">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-signal-muted">
+                    <BadgeCheck className="h-3.5 w-3.5 text-signal-accent" />
+                    Evidenced skills
+                  </p>
+                  {profileReady ? (
+                    <p className="inline-flex items-center gap-1 text-[11px] font-medium text-signal-teal">
+                      <EyeOff className="h-3 w-3" />
+                      Alias only
+                    </p>
+                  ) : null}
+                </div>
+                <ul className="flex flex-wrap gap-2">
+                  {skills.slice(0, 6).map((s) => (
+                    <li
+                      key={s.label}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-signal-accent/15 bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-signal-ink shadow-soft"
+                    >
+                      <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-signal-accentSoft text-signal-accent">
+                        <BadgeCheck className="h-3 w-3" />
+                      </span>
+                      {s.label}
+                    </li>
+                  ))}
+                  {skillCount > 6 ? (
+                    <li className="inline-flex items-center rounded-xl border border-dashed border-signal-line bg-signal-foam/70 px-2.5 py-1.5 text-xs font-semibold text-signal-muted">
+                      +{skillCount - 6} more
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
             ) : (
-              <p className="text-sm text-white/75">No evidenced skills yet — start your story.</p>
+              <div className="relative mt-5 flex items-start gap-3 rounded-2xl border border-dashed border-signal-line/90 bg-signal-foam/50 px-3.5 py-3.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-signal-accentSoft text-signal-accent">
+                  <Mic2 className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-signal-ink">No skills yet</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-signal-muted">
+                    Record a few real situations — skills appear only with quotes from your words.
+                  </p>
+                </div>
+              </div>
             )}
           </div>
-        </div>
 
-        <div className="grid grid-cols-3 divide-x divide-signal-line border-t border-signal-line">
-          {[
-            {
-              icon: BadgeCheck,
-              value: String(skillCount),
-              label: "Evidenced skills",
-              tone: "accent" as const,
-            },
-            {
-              icon: MessagesSquare,
-              value: String(list.length),
-              label: "Suggestions",
-              tone: "sky" as const,
-            },
-            {
-              icon: Ticket,
-              value: String(budget),
-              label: "Approaches left",
-              tone: "deep" as const,
-            },
-          ].map(({ icon: Icon, value, label, tone }) => (
-            <div
-              key={label}
-              className="flex min-w-0 flex-col items-center gap-2 px-2 py-4 text-center sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-5 sm:text-left"
-            >
-              <span
-                className={cn(
-                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl sm:h-11 sm:w-11",
-                  tone === "accent" && "bg-signal-accentSoft text-signal-accent",
-                  tone === "sky" && "bg-signal-skySoft text-signal-sky",
-                  tone === "deep" && "bg-signal-tealSoft text-signal-teal",
-                )}
-              >
-                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-xl font-bold leading-none text-signal-ink sm:text-2xl">{value}</p>
-                <p className="mt-1 text-[10px] leading-snug text-signal-muted sm:mt-1.5 sm:text-xs">
-                  {label}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="mt-5 grid gap-5 sm:mt-6 sm:gap-6 lg:grid-cols-[1.6fr_1fr]">
-        <section className="rounded-[22px] border border-signal-line/80 bg-white p-4 shadow-soft sm:rounded-[28px] sm:p-6">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="text-[15px] font-bold text-signal-ink">Suggested conversations</h2>
-              <p className="mt-1 text-sm text-signal-muted">
-                Plain-language fit notes — AI assists, you decide.
-              </p>
-            </div>
-            <Link
-              href="/seeker/event"
-              className="text-sm font-semibold text-signal-accent hover:underline"
-            >
-              Browse all
-            </Link>
-          </div>
-
-          <div className="mt-4 space-y-3 sm:mt-5">
-            {list.slice(0, 4).map((s) => (
-              <Link
-                key={s.brief_id}
-                href={`/seeker/event/${s.brief_id}`}
-                className="group flex items-start gap-3 rounded-2xl border border-signal-line/80 bg-signal-foam/50 px-3 py-3.5 transition hover:border-signal-accent/30 hover:bg-white sm:gap-4 sm:px-4 sm:py-4"
+          <div className="grid grid-cols-3 gap-px border-t border-signal-line bg-signal-line/80">
+            {[
+              {
+                icon: BadgeCheck,
+                value: String(skillCount),
+                label: "Skills",
+                hint: profileReady ? "Approved" : "In story",
+                tone: "accent" as const,
+              },
+              {
+                icon: MessagesSquare,
+                value: String(list.length),
+                label: "Suggested",
+                hint: "Matches",
+                tone: "sky" as const,
+              },
+              {
+                icon: Ticket,
+                value: String(budget),
+                label: "Approaches",
+                hint: "Left today",
+                tone: "deep" as const,
+              },
+            ].map(({ icon: Icon, value, label, hint, tone }) => (
+              <div
+                key={label}
+                className="flex flex-col items-center gap-1.5 bg-white px-2 py-3.5 text-center sm:flex-row sm:justify-center sm:gap-3 sm:px-3 sm:text-left"
               >
                 <span
                   className={cn(
-                    "mt-0.5 shrink-0 rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide sm:text-[11px]",
-                    s.bucket === "strong" && "bg-signal-accentSoft text-signal-accent",
-                    s.bucket === "good" && "bg-signal-skySoft text-signal-sky",
-                    s.bucket === "explore" && "bg-signal-tealSoft text-signal-teal",
+                    "flex h-10 w-10 items-center justify-center rounded-2xl",
+                    tone === "accent" && "bg-signal-accentSoft text-signal-accent",
+                    tone === "sky" && "bg-signal-skySoft text-signal-sky",
+                    tone === "deep" && "bg-signal-tealSoft text-signal-teal",
                   )}
                 >
-                  {BUCKET_LABEL[s.bucket]}
+                  <Icon className="h-4 w-4" strokeWidth={2} />
                 </span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-signal-ink">
-                    {s.company_name ?? `Brief #${s.brief_id}`}
-                  </p>
-                  <p className="mt-1 line-clamp-2 text-sm text-signal-muted">
-                    {s.fit_summary ?? s.overview ?? s.brief_summary ?? "See why this was suggested."}
-                  </p>
+                <div>
+                  <p className="text-lg font-bold leading-none tabular-nums text-signal-ink">{value}</p>
+                  <p className="mt-0.5 text-[11px] font-semibold text-signal-ink/80">{label}</p>
+                  <p className="hidden text-[10px] text-signal-muted sm:block">{hint}</p>
                 </div>
-                <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-signal-muted transition group-hover:text-signal-accent" />
-              </Link>
+              </div>
             ))}
           </div>
-
-          {!suggestions.isLoading && !list.length ? (
-            <p className="mt-4 rounded-2xl border border-dashed border-signal-line p-4 text-sm text-signal-muted">
-              Approve a skill story to unlock suggestions — or{" "}
-              <Link href="/seeker/event" className="font-semibold text-signal-accent underline">
-                browse every brief
-              </Link>
-              .
-            </p>
-          ) : null}
         </section>
 
-        <LanguageCard />
+        <CopilotChat variant="compact" />
       </div>
+
+      <section className="mt-4 rounded-[22px] border border-signal-line/80 bg-white p-4 shadow-soft sm:p-5">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-sm font-bold text-signal-ink">Suggested conversations</h2>
+          <Link href="/seeker/event" className="text-xs font-semibold text-signal-accent hover:underline">
+            See all
+          </Link>
+        </div>
+        <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+          {list.slice(0, 4).map((s) => (
+            <Link
+              key={s.brief_id}
+              href={`/seeker/event/${s.brief_id}`}
+              className="group flex items-start gap-2.5 rounded-2xl border border-signal-line/80 bg-signal-foam/40 px-3 py-3 transition hover:border-signal-accent/30 hover:bg-white"
+            >
+              <span
+                className={cn(
+                  "mt-0.5 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase",
+                  s.bucket === "strong" && "bg-signal-accentSoft text-signal-accent",
+                  s.bucket === "good" && "bg-signal-skySoft text-signal-sky",
+                  s.bucket === "explore" && "bg-signal-tealSoft text-signal-teal",
+                )}
+              >
+                {BUCKET_LABEL[s.bucket]}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-signal-ink">
+                  {s.company_name ?? `Brief #${s.brief_id}`}
+                </p>
+                <p className="mt-0.5 line-clamp-1 text-xs text-signal-muted">
+                  {s.fit_summary ?? s.overview ?? s.brief_summary ?? "See why"}
+                </p>
+              </div>
+              {s.skill_overlap_pct != null ? (
+                <span className="mt-0.5 shrink-0 rounded-lg bg-white px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-signal-accent">
+                  {s.skill_overlap_pct}%
+                </span>
+              ) : (
+                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-signal-muted group-hover:text-signal-accent" />
+              )}
+            </Link>
+          ))}
+        </div>
+        {!suggestions.isLoading && !list.length ? (
+          <p className="mt-3 rounded-2xl border border-dashed border-signal-line px-3 py-4 text-center text-sm text-signal-muted">
+            Approve a skill story to unlock suggestions, or{" "}
+            <Link href="/seeker/event" className="font-semibold text-signal-accent underline">
+              browse all
+            </Link>
+            .
+          </p>
+        ) : null}
+      </section>
     </DashboardShell>
   );
 }

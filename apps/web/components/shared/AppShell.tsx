@@ -24,11 +24,15 @@ export function AppShell({
   title,
   subtitle,
   role: roleProp,
+  fitViewport = false,
+  hideHeading = false,
 }: {
   children: React.ReactNode;
   title?: string;
   subtitle?: string;
   role?: AppRole;
+  fitViewport?: boolean;
+  hideHeading?: boolean;
 }) {
   const pathname = usePathname();
   const [role, setRole] = useState<AppRole | null>(roleProp ?? null);
@@ -46,7 +50,13 @@ export function AppShell({
   }
 
   return (
-    <DashboardShell role={role} title={title || APP_NAME} subtitle={subtitle}>
+    <DashboardShell
+      role={role}
+      title={title || APP_NAME}
+      subtitle={subtitle}
+      fitViewport={fitViewport}
+      hideHeading={hideHeading}
+    >
       {children}
     </DashboardShell>
   );

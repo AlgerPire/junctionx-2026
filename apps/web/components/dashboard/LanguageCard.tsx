@@ -207,8 +207,68 @@ export function LanguageSwitcher({
   );
 }
 
-export function LanguageCard() {
+export function LanguageCard({ compact }: { compact?: boolean }) {
   const [pref, choose, detected] = useSpeechLangPreference();
+
+  if (compact) {
+    return (
+      <section className="glass-card p-3.5 sm:p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-signal-accentSoft text-signal-accent">
+              <Languages className="h-4 w-4" />
+            </span>
+            <div>
+              <h2 className="text-sm font-bold text-signal-ink">Language</h2>
+              <p className="text-[11px] text-signal-muted">
+                {pref === "auto"
+                  ? detected
+                    ? `Auto · ${SPEECH_LANGS.find((l) => l.code === detected)?.label}`
+                    : "Auto · learns as you speak"
+                  : preferenceLabel(pref)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-3 flex gap-1.5 overflow-x-auto pb-0.5">
+          <button
+            type="button"
+            onClick={() => choose("auto")}
+            aria-pressed={pref === "auto"}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+              pref === "auto"
+                ? "border-signal-accent bg-signal-accentSoft text-signal-accent"
+                : "border-signal-line bg-white text-signal-ink hover:border-signal-accent/40",
+            )}
+          >
+            <Flag kind="auto" className="h-4 w-4" />
+            Auto
+          </button>
+          {SPEECH_LANGS.map((l) => {
+            const active = pref === l.code;
+            return (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => choose(l.code)}
+                aria-pressed={active}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                  active
+                    ? "border-signal-accent bg-signal-accentSoft text-signal-accent"
+                    : "border-signal-line bg-white text-signal-ink hover:border-signal-accent/40",
+                )}
+              >
+                <Flag kind={l.flag} className="h-4 w-4" />
+                {l.short}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="glass-card p-4 sm:p-5">
@@ -271,10 +331,6 @@ export function LanguageCard() {
           );
         })}
       </div>
-      <p className="mt-3 text-xs text-signal-muted">
-        Auto learns from what you say or type — not from the browser language. The mic and
-        captions follow the detected or chosen language.
-      </p>
     </section>
   );
 }

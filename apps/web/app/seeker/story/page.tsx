@@ -14,8 +14,9 @@ import {
   VolumeX,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { RetakeStoryModal } from "@/components/seeker/RetakeStoryModal";
 import { AppShell } from "@/components/shared/AppShell";
 import { TranscriptPanel } from "@/components/voice/TranscriptPanel";
 import { VoiceRecorder } from "@/components/voice/VoiceRecorder";
@@ -50,6 +51,8 @@ export default function SeekerStoryPage() {
   const [finishing, setFinishing] = useState(false);
   /** After Finish interview — review step is the destination, not a side panel. */
   const [reviewMode, setReviewMode] = useState(false);
+  const [retakeOpen, setRetakeOpen] = useState(false);
+  const [retakeBusy, setRetakeBusy] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -95,12 +98,18 @@ export default function SeekerStoryPage() {
   const story = storyQuery.data;
   const started = !!interview.sessionId;
   const interviewing = started && !reviewMode;
-  const currentQuestion = useMemo(() => {
-    const last = [...interview.messages].reverse().find((m) => m.role === "assistant");
-    return last?.content ?? null;
-  }, [interview.messages]);
+  const retaking = interviewing && Boolean(story?.skills?.length || story?.status === "approved");
 
-  const activeStep = story?.status === "approved" ? 2 : reviewMode ? 1 : interviewing ? 0 : 0;
+  // While talking (including a retake), Talk is current — don't show Review/Share as done
+  // just because an older story is still approved.
+  const activeStep = interviewing ? 0 : reviewMode ? (story?.status === "approved" ? 2 : 1) : 0;
+
+  const aiState =
+    interview.status === "speaking"
+      ? ("speaking" as const)
+      : interview.status === "thinking" || finishing
+        ? ("thinking" as const)
+        : null;
 
   const statusLabel =
     interview.status === "thinking"
@@ -119,7 +128,17 @@ export default function SeekerStoryPage() {
     setIsNewUser(false);
     setReviewMode(false);
     setShowTranscript(false);
+    setRetakeOpen(false);
     await interview.start("story", getPersonaId() ?? "seeker_demo_a");
+  }
+
+  async function confirmRetake() {
+    setRetakeBusy(true);
+    try {
+      await beginStory();
+    } finally {
+      setRetakeBusy(false);
+    }
   }
 
   async function finishInterview() {
@@ -149,6 +168,27 @@ export default function SeekerStoryPage() {
       data-testid="story-review"
       className="rounded-[22px] border border-signal-line/80 bg-white p-4 shadow-soft sm:rounded-[28px] sm:p-7"
     >
+      <button
+        type="button"
+        onClick={() => setRetakeOpen(true)}
+        className="group mb-5 flex w-full items-center gap-3 rounded-[20px] border border-signal-accent/35 bg-gradient-to-r from-signal-accentSoft via-white to-signal-tealSoft/50 p-3.5 text-left shadow-soft transition hover:border-signal-accent/55 hover:shadow-glass sm:mb-6 sm:gap-4 sm:p-4"
+      >
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-signal-accent text-white shadow-orb transition group-hover:scale-[1.03]">
+          <Mic2 className="h-5 w-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-bold text-signal-ink sm:text-base">
+            {story?.skills?.length ? "Retake the interview" : "Start the interview"}
+          </span>
+          <span className="mt-0.5 block text-xs leading-snug text-signal-muted sm:text-sm">
+            {story?.skills?.length
+              ? "Tell new situations — we’ll rebuild skills and quotes from your latest answers."
+              : "A short voice or text chat. Skills only appear with evidence from your words."}
+          </span>
+        </span>
+        <ArrowRight className="h-5 w-5 shrink-0 text-signal-accent transition group-hover:translate-x-0.5" />
+      </button>
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-signal-tealSoft text-signal-teal">
@@ -242,14 +282,6 @@ export default function SeekerStoryPage() {
         >
           Go to conversations
         </Link>
-        <button
-          type="button"
-          onClick={() => void beginStory()}
-          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-signal-line bg-white px-5 py-3 text-sm font-semibold text-signal-ink transition hover:bg-signal-foam"
-        >
-          <Mic2 className="h-4 w-4 text-signal-accent" />
-          {story?.skills?.length ? "Retake interview" : "Start interview"}
-        </button>
       </div>
     </section>
   );
@@ -258,36 +290,54 @@ export default function SeekerStoryPage() {
     <AppShell
       role="seeker"
       title="Skill story"
-      subtitle="Build your profile in your own words — voice or text. Nothing is shared until you approve."
+      subtitle={
+        interviewing
+          ? undefined
+          : "Build your profile in your own words — voice or text. Nothing is shared until you approve."
+      }
+      fitViewport={interviewing}
+      hideHeading={interviewing}
     >
-      <ol className="mb-5 flex items-stretch gap-1.5 sm:mb-6 sm:gap-2">
-        {PROFILE_STEPS.map((step, i) => (
-          <li
-            key={step.id}
-            className={cn(
-              "flex min-w-0 flex-1 items-center gap-2 rounded-2xl border px-2.5 py-2.5 sm:gap-3 sm:px-4 sm:py-3",
-              i === activeStep
-                ? "border-signal-accent/40 bg-signal-accentSoft"
-                : i < activeStep
-                  ? "border-signal-line bg-white"
-                  : "border-dashed border-signal-line/80 bg-white/50",
-            )}
-          >
-            <span
-              className={cn(
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-bold sm:h-8 sm:w-8 sm:text-sm",
-                i <= activeStep ? "bg-signal-accent text-white" : "bg-signal-foam text-signal-muted",
-              )}
-            >
-              {i < activeStep ? <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : i + 1}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-signal-ink sm:text-sm">{step.label}</p>
-              <p className="hidden truncate text-xs text-signal-muted sm:block">{step.hint}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+      {!interviewing ? (
+        <div className="mb-5 w-full min-w-0 sm:mb-7">
+          <ol className="flex w-full min-w-0 items-stretch gap-1.5 sm:gap-2.5">
+            {PROFILE_STEPS.map((step, i) => {
+              const done = i < activeStep;
+              const current = i === activeStep;
+              return (
+                <li
+                  key={step.id}
+                  className={cn(
+                    "flex min-w-0 flex-1 items-center gap-1.5 rounded-2xl border px-2 py-2 shadow-soft transition sm:gap-3 sm:px-4 sm:py-3",
+                    current
+                      ? "border-signal-accent/45 bg-gradient-to-br from-signal-accentSoft to-white ring-1 ring-signal-accent/20"
+                      : done
+                        ? "border-signal-line/90 bg-white"
+                        : "border-dashed border-signal-line/70 bg-white/55",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-xs font-bold sm:h-8 sm:w-8 sm:text-sm",
+                      current || done
+                        ? "bg-signal-accent text-white shadow-orb"
+                        : "bg-signal-foam text-signal-muted",
+                    )}
+                  >
+                    {done ? <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : i + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-semibold text-signal-ink sm:text-sm">
+                      {step.label}
+                    </p>
+                    <p className="hidden truncate text-xs text-signal-muted sm:block">{step.hint}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ) : null}
 
       {/* Idle: start hero */}
       {!started && !reviewMode ? (
@@ -344,52 +394,79 @@ export default function SeekerStoryPage() {
         </div>
       ) : null}
 
-      {/* Interviewing: voice left, conversation right */}
+      {/* Interviewing: locked to one screen — only the message list scrolls */}
       {interviewing ? (
-        <div className="grid gap-4 lg:grid-cols-[1.15fr_1fr] lg:gap-5 xl:gap-6">
-          <section className="overflow-hidden rounded-[22px] border border-signal-line/80 bg-white shadow-soft sm:rounded-[28px]">
-            <div className="flex items-center justify-between gap-2 border-b border-signal-line px-3.5 py-3 sm:gap-3 sm:px-5 sm:py-4">
-              <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-signal-accentSoft text-signal-accent sm:h-10 sm:w-10">
-                  {interview.status === "thinking" || interview.status === "speaking" || finishing ? (
-                    <Loader2 className="h-4 w-4 animate-spin sm:h-5 sm:w-5" />
+        <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden">
+          <section className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-[20px] border border-signal-line/70 bg-white shadow-soft sm:rounded-[24px]">
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-signal-line/80 px-3 py-2.5 sm:px-4">
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  className={cn(
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-signal-accent",
+                    interview.status === "speaking"
+                      ? "bg-signal-accent text-white"
+                      : "bg-signal-accentSoft",
+                  )}
+                >
+                  {interview.status === "thinking" || finishing ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : interview.status === "speaking" ? (
+                    <Volume2 className="h-3.5 w-3.5" />
                   ) : (
-                    <Mic2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <Mic2 className="h-3.5 w-3.5" />
                   )}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-signal-ink">Live interview</p>
-                  <p className="truncate text-xs text-signal-muted">
+                  <p className="truncate text-sm font-semibold text-signal-ink">
+                    {retaking ? "Retaking skill story" : "Skill story interview"}
+                  </p>
+                  <p className="truncate text-[11px] text-signal-muted">
                     {finishing ? "Building your skill list…" : statusLabel}
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => interview.setMuted((m) => !m)}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-signal-line px-2.5 py-2 text-xs font-semibold text-signal-ink hover:bg-signal-foam sm:px-3"
-                aria-label={interview.muted ? "Unmute AI" : "Mute AI voice"}
-              >
-                {interview.muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                <span className="hidden sm:inline">{interview.muted ? "Unmute" : "Mute voice"}</span>
-              </button>
+              <div className="flex shrink-0 items-center gap-1.5">
+                {interview.status === "speaking" ? (
+                  <button
+                    type="button"
+                    className="rounded-xl border border-signal-accent/35 bg-white px-2.5 py-1.5 text-xs font-semibold text-signal-accent"
+                    onClick={() => interview.stopAssistant()}
+                  >
+                    Stop
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => interview.setMuted((m) => !m)}
+                  className="inline-flex items-center gap-1 rounded-xl border border-signal-line/90 bg-white px-2.5 py-1.5 text-xs font-semibold text-signal-ink"
+                  aria-label={interview.muted ? "Unmute AI" : "Mute AI voice"}
+                >
+                  {interview.muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                  <span className="hidden sm:inline">{interview.muted ? "Unmute" : "Mute"}</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={finishing}
+                  className="rounded-xl bg-signal-ink px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                  onClick={() => void finishInterview()}
+                >
+                  {finishing ? "…" : "Finish"}
+                </button>
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-signal-accentSoft/70 via-white to-signal-tealSoft/40 px-4 py-5 sm:px-6 sm:py-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-signal-accent">
-                AI question
-              </p>
-              <p className="mt-2 text-xl font-bold leading-snug tracking-tight text-signal-ink sm:text-2xl">
-                {currentQuestion ?? "Preparing your first question…"}
-              </p>
-              <p className="mt-2 text-sm text-signal-muted sm:mt-3">
-                Speak or type. When you pause, we send your answer and ask the next question.
-              </p>
-            </div>
+            <TranscriptPanel
+              hideHeader
+              messages={interview.messages}
+              thinking={interview.replying}
+              className="min-h-0 max-h-none flex-1 rounded-none border-0 shadow-none"
+            />
 
-            <div className="border-t border-signal-line">
+            <div className="shrink-0 border-t border-signal-line/80 bg-signal-foam/40">
               <VoiceRecorder
+                dense
                 embedded
+                aiState={aiState}
                 disabled={
                   finishing ||
                   !started ||
@@ -398,58 +475,22 @@ export default function SeekerStoryPage() {
                 }
                 statusHint={
                   interview.status === "speaking"
-                    ? "AI is speaking — tap mic to interrupt"
-                    : "Answer the question out loud or type below."
+                    ? "Tap mic to interrupt"
+                    : "Speak or type your answer"
                 }
                 onTranscript={(t) => void interview.sendUserText(t)}
               />
-            </div>
-
-            {interview.error ? (
-              <p className="px-4 pb-3 text-sm text-signal-warn sm:px-5">{interview.error}</p>
-            ) : null}
-
-            <div className="flex flex-col gap-2 border-t border-signal-line px-3.5 py-3 sm:flex-row sm:flex-wrap sm:gap-3 sm:px-5 sm:py-4">
-              <button
-                type="button"
-                disabled={finishing}
-                className="rounded-2xl bg-signal-ink px-5 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50"
-                onClick={() => void finishInterview()}
-              >
-                {finishing ? "Finishing…" : "Finish interview"}
-              </button>
-              {interview.status === "speaking" ? (
-                <button
-                  type="button"
-                  className="rounded-2xl border border-signal-line px-5 py-3 text-sm font-semibold text-signal-ink"
-                  onClick={() => interview.stopAssistant()}
-                >
-                  Stop speaking
-                </button>
+              {interview.error ? (
+                <p className="px-3 pb-2 text-sm text-signal-warn sm:px-4">{interview.error}</p>
               ) : null}
-              <button
-                type="button"
-                className="rounded-2xl border border-signal-line px-5 py-3 text-sm font-semibold text-signal-ink lg:hidden"
-                onClick={() => setShowTranscript((v) => !v)}
-              >
-                {showTranscript ? "Hide conversation" : "Show conversation"}
-              </button>
             </div>
           </section>
-
-          <div className={cn("min-h-0", !showTranscript && "hidden lg:block")}>
-            <TranscriptPanel
-              messages={interview.messages}
-              thinking={interview.replying}
-              className="h-full min-h-[20rem] max-h-[70vh] rounded-[22px] sm:rounded-[28px] lg:max-h-none"
-            />
-          </div>
         </div>
       ) : null}
 
       {/* Review: after finish (or returning with an existing story) */}
       {reviewMode ? (
-        <div className="grid gap-5 lg:grid-cols-[1.55fr_0.85fr] lg:gap-6">
+        <div className="grid w-full min-w-0 max-w-full gap-5 overflow-x-hidden lg:grid-cols-[minmax(0,1.55fr)_minmax(0,0.85fr)] lg:gap-6">
           {reviewPanel}
           <div className="space-y-4">
             {matchingTip}
@@ -474,6 +515,20 @@ export default function SeekerStoryPage() {
           </div>
         </div>
       ) : null}
+
+      <RetakeStoryModal
+        open={retakeOpen}
+        story={
+          story
+            ? { status: story.status, skills: story.skills }
+            : null
+        }
+        busy={retakeBusy}
+        onClose={() => {
+          if (!retakeBusy) setRetakeOpen(false);
+        }}
+        onConfirm={() => void confirmRetake()}
+      />
     </AppShell>
   );
 }

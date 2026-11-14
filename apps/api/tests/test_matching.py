@@ -33,6 +33,9 @@ def test_direct_match_strong() -> None:
     assert sug is not None
     assert sug.bucket == "strong"
     assert coverage == 1.0
+    assert sug.skill_overlap_pct == 100
+    assert sug.must_have_total == 1
+    assert sug.must_have_covered == 1
     assert sug.reasons[0].type == "direct"
     assert sug.reasons[0].evidence_quote is not None
     assert sug.overview

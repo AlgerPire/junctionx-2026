@@ -29,6 +29,7 @@ export function VoiceRecorder({
   variant = "card",
   aiState = null,
   embedded = false,
+  dense = false,
 }: {
   onTranscript: (text: string) => void;
   lang?: string;
@@ -37,6 +38,8 @@ export function VoiceRecorder({
   variant?: "card" | "immersive";
   /** Skip the outer glass card when already wrapped by a parent. */
   embedded?: boolean;
+  /** Compact composer for viewport-locked interview layouts. */
+  dense?: boolean;
   aiState?: "speaking" | "thinking" | null;
 }) {
   const [phase, setPhase] = useState<Phase>("idle");
@@ -295,6 +298,8 @@ export function VoiceRecorder({
 
   const recording = phase === "recording";
   const busy = phase === "transcribing" || disabled;
+  const aiSpeaking = aiState === "speaking" && !recording;
+  const aiThinking = (aiState === "thinking" || phase === "transcribing") && !recording;
 
   // Keep the pill short — long hints wrap and leak on narrow screens.
   const statusLabel =
@@ -307,6 +312,36 @@ export function VoiceRecorder({
           : aiState === "speaking"
             ? "Speaking"
             : "Ready";
+
+  const statusTone: "teal" | "purple" | "blue" = recording
+    ? "teal"
+    : aiSpeaking || aiThinking
+      ? "blue"
+      : "purple";
+
+  const orbLabel = recording
+    ? "Stop recording"
+    : aiSpeaking
+      ? "Interrupt AI and start speaking"
+      : "Start recording";
+
+  const headline = recording
+    ? `Listening · ${elapsed}s`
+    : phase === "transcribing"
+      ? "Turning speech into text…"
+      : aiSpeaking
+        ? "AI is speaking"
+        : aiThinking
+          ? "Thinking…"
+          : "Tap to speak";
+
+  const subline = liveCaption
+    ? null
+    : recording
+      ? "Stops automatically when you pause."
+      : aiSpeaking
+        ? statusHint || "Tap the mic to interrupt"
+        : statusHint || "Tap the mic to speak. Stops automatically when you pause.";
 
   const textForm = showText ? (
     <form
@@ -341,8 +376,68 @@ export function VoiceRecorder({
       <LanguageSwitcher disabled={recording} menu={variant === "immersive" ? "up" : "down"} />
     );
 
+  if (dense) {
+    return (
+      <div className="min-w-0 space-y-2 px-3 py-2.5 sm:px-4">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          {langSelect}
+          <StatusPill label={statusLabel} tone={statusTone} />
+          <p className="min-w-0 flex-1 truncate text-xs text-signal-muted" aria-live="polite">
+            {liveCaption
+              ? `“${liveCaption}”`
+              : recording
+                ? `Listening · ${elapsed}s`
+                : statusHint || headline}
+          </p>
+        </div>
+        <div className="flex min-w-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => (recording ? stop() : void start())}
+            disabled={busy && !recording}
+            aria-label={orbLabel}
+            className={cn(
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full shadow-soft transition disabled:opacity-40",
+              recording
+                ? "bg-signal-teal text-white"
+                : "bg-signal-accent text-white hover:bg-signal-accentDeep",
+            )}
+          >
+            {recording ? <Square className="h-4 w-4 fill-current" /> : <Mic className="h-4 w-4" />}
+          </button>
+          <form
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-signal-line bg-white py-1 pl-3.5 pr-1 focus-within:border-signal-accent/50"
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendTyped();
+            }}
+          >
+            <input
+              value={typed}
+              onChange={(e) => setTyped(e.target.value)}
+              disabled={busy && !recording}
+              data-testid="voice-text-input"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-signal-muted"
+              placeholder="Type your answer…"
+              aria-label="Type your answer"
+            />
+            <button
+              type="submit"
+              aria-label="Send"
+              disabled={busy && !recording}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-signal-ink text-white transition hover:brightness-110 disabled:opacity-40"
+            >
+              <SendHorizontal className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
+        {error ? <p className="text-sm text-signal-warn">{error}</p> : null}
+      </div>
+    );
+  }
+
   if (variant === "immersive") {
-    const headline = recording
+    const immersiveHeadline = recording
       ? `Listening · ${elapsed}s`
       : phase === "transcribing"
         ? "Turning speech into text…"
@@ -360,7 +455,7 @@ export function VoiceRecorder({
             thinking={aiState === "thinking" || phase === "transcribing"}
             disabled={busy && !recording}
             onClick={() => (recording ? stop() : void start())}
-            label={recording ? "Stop recording" : "Start recording"}
+            label={orbLabel}
           />
           <p
             data-testid="voice-status"
@@ -369,7 +464,7 @@ export function VoiceRecorder({
             aria-live="polite"
           >
             <Volume2 className="h-4 w-4" aria-hidden />
-            {headline}
+            {immersiveHeadline}
           </p>
           <p className="min-h-[2.5rem] max-w-md text-center text-sm italic text-signal-muted" aria-live="polite">
             {liveCaption ? `“${liveCaption}”` : recording ? "" : "Stops automatically when you pause."}
@@ -415,53 +510,67 @@ export function VoiceRecorder({
   }
 
   return (
-    <div className={cn(embedded ? "overflow-hidden" : "glass-card overflow-hidden")}>
-      <div className={cn(embedded ? "px-3 pt-3 sm:px-4 sm:pt-4" : "px-6 pt-6")}>
+    <div
+      className={cn(
+        "overflow-hidden transition-colors duration-300",
+        embedded ? "" : "glass-card",
+        aiSpeaking && embedded && "bg-gradient-to-b from-signal-accentSoft/40 to-transparent",
+        recording && embedded && "bg-gradient-to-b from-signal-tealSoft/50 to-transparent",
+      )}
+    >
+      <div className={cn(embedded ? "px-3 pt-3 sm:px-5 sm:pt-4" : "px-6 pt-6")}>
         <div className="flex min-w-0 items-center justify-between gap-2">
-          <h2 className="shrink-0 text-[15px] font-bold text-signal-ink">Live voice</h2>
+          {!embedded ? (
+            <h2 className="shrink-0 text-[15px] font-bold text-signal-ink">Live voice</h2>
+          ) : (
+            <p className="min-w-0 truncate text-xs font-semibold uppercase tracking-[0.12em] text-signal-muted">
+              {aiSpeaking ? "Your mic · tap to interrupt" : "Your answer"}
+            </p>
+          )}
           <div className="flex min-w-0 items-center gap-2">
             {langSelect}
-            <StatusPill label={statusLabel} tone={recording ? "teal" : "purple"} />
+            <StatusPill label={statusLabel} tone={statusTone} />
           </div>
         </div>
       </div>
 
-      <VoiceStage active={recording} compact={embedded}>
+      <VoiceStage active={recording} speaking={aiSpeaking} compact={embedded}>
         <MicOrb
           recording={recording}
+          speaking={aiSpeaking}
+          thinking={aiThinking}
           disabled={busy && !recording}
           onClick={() => (recording ? stop() : void start())}
-          label={recording ? "Stop recording" : "Start recording"}
+          label={orbLabel}
         />
       </VoiceStage>
 
-      <div className={cn("-mt-2 text-center", embedded ? "px-3 pb-3 sm:px-4" : "-mt-4 px-6 pb-5")}>
+      <div className={cn("-mt-1 text-center", embedded ? "px-3 pb-3 sm:px-5" : "-mt-4 px-6 pb-5")}>
         <p
           data-testid="voice-status"
           data-phase={phase}
-          className={cn("font-bold text-signal-ink", embedded ? "text-base" : "text-lg")}
+          className={cn(
+            "font-bold tracking-tight text-signal-ink transition-colors",
+            embedded ? "text-base sm:text-lg" : "text-lg",
+            aiSpeaking && "text-signal-accent",
+            recording && "text-signal-teal",
+          )}
         >
-          {recording
-            ? `Listening · ${elapsed}s`
-            : phase === "transcribing"
-              ? "Turning speech into text…"
-              : "Tap to speak"}
+          {headline}
         </p>
         {liveCaption ? (
-          <p className="mx-auto mt-1 max-w-md text-sm italic text-signal-muted" aria-live="polite">
+          <p className="mx-auto mt-1.5 max-w-md text-sm italic leading-relaxed text-signal-muted" aria-live="polite">
             “{liveCaption}”
           </p>
         ) : (
-          <p className="mx-auto mt-1 max-w-sm text-sm text-signal-muted">
-            {statusHint || "Tap the mic to interrupt. Stops automatically when you pause."}
-          </p>
+          <p className="mx-auto mt-1.5 max-w-sm text-sm leading-relaxed text-signal-muted">{subline}</p>
         )}
       </div>
 
       <div
         className={cn(
-          "border-t border-signal-line",
-          embedded ? "px-3 py-3 sm:px-4" : "px-6 py-4",
+          "border-t border-signal-line/80",
+          embedded ? "px-3 py-3 sm:px-5" : "px-6 py-4",
         )}
       >
         {textForm}

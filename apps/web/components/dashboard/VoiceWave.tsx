@@ -44,7 +44,13 @@ export function VoiceWave({
 }) {
   const heights = barHeights(bars, seed);
   return (
-    <div className={cn("relative flex h-24 items-center gap-[4px]", className)} aria-hidden>
+    <div
+      className={cn(
+        "relative flex h-24 w-full min-w-0 max-w-full items-center justify-center gap-0.5 overflow-hidden",
+        className,
+      )}
+      aria-hidden
+    >
       {baseline ? (
         <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-signal-accent/15" />
       ) : null}
@@ -52,7 +58,7 @@ export function VoiceWave({
         <span
           key={i}
           className={cn(
-            "relative w-[3px] shrink-0 rounded-full",
+            "relative max-w-[3px] min-w-0 flex-1 rounded-full",
             TONE_BG[tone],
             active && "animate-wave-bar",
           )}

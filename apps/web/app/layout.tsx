@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   title: `${APP_NAME} — Espoo recruitment matchmaking`,
   description:
     "AI helps people explain themselves. Humans decide who to talk to. Built for City of Espoo recruitment events.",
+  applicationName: APP_NAME,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

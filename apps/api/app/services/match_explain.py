@@ -97,4 +97,26 @@ def attach_overview(suggestion: Suggestion, coverage: float, *, perspective: str
     suggestion.fit_summary = fit
     suggestion.gaps_summary = gaps
     suggestion.overview = overview
+    # Coverage is already (direct + 0.5 * transferable) / n_must — surface it for the UI.
+    pct = int(round(max(0.0, min(1.0, coverage)) * 100))
+    suggestion.skill_overlap_pct = pct
+    must_reasons = [
+        r
+        for r in suggestion.reasons
+        if r.type in {"direct", "transferable", "consideration"} and r.brief_skill
+    ]
+    # Deduplicate by brief_skill so each must-have is counted once.
+    seen: set[str] = set()
+    covered = 0
+    total = 0
+    for r in must_reasons:
+        key = (r.brief_skill or "").lower()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        total += 1
+        if r.type in {"direct", "transferable"}:
+            covered += 1
+    suggestion.must_have_total = total or None
+    suggestion.must_have_covered = covered if total else None
     return suggestion

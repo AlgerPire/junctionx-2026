@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
@@ -14,18 +14,26 @@ from app.services.copilot_tools import (
     get_my_budget,
     get_my_suggestions,
     get_queue_estimate,
+    llm_copilot_answer,
+    rule_based_answer,
 )
 from app.services.embeddings import skill_index
 
 router = APIRouter(prefix="/api", tags=["copilot"])
 
 
+class HistoryTurn(BaseModel):
+    role: str = Field(min_length=1, max_length=32)
+    content: str = Field(min_length=1, max_length=2000)
+
+
 class AskBody(BaseModel):
-    text: str
+    text: str = Field(min_length=1, max_length=2000)
+    history: list[HistoryTurn] = Field(default_factory=list, max_length=8)
 
 
 @router.post("/copilot/ask")
-def copilot_ask(
+async def copilot_ask(
     body: AskBody,
     db: Session = Depends(get_db),
     persona: PersonaContext = Depends(resolve_persona),
@@ -33,70 +41,52 @@ def copilot_ask(
     if persona.role != "seeker":
         raise HTTPException(status_code=403, detail="Seeker persona required")
     seeker = seeker_from_persona(db, persona)
-    text = body.text.lower()
+    question = body.text.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Empty question")
 
     cards = get_my_suggestions(db, seeker, limit=5)
     budget = get_my_budget(seeker)
-    sources = [c["brief_id"] for c in cards[:3]]
 
-    if "budget" in text:
+    queue_minutes: int | None = None
+    if cards and any(w in question.lower() for w in ("queue", "wait", "how long")):
+        brief = db.get(Brief, cards[0]["brief_id"])
+        if brief:
+            queue_minutes = int(get_queue_estimate(db, brief).get("est_minutes") or 0)
+
+    # Prefer company mention from suggestions only.
+    lowered = question.lower()
+    mentioned = next(
+        (c for c in cards if c.get("company_name") and str(c["company_name"]).lower() in lowered),
+        None,
+    )
+    if mentioned:
+        summary = get_brief_summary(db, mentioned["brief_id"]) or {}
+        company = summary.get("company") or mentioned.get("company_name") or "That company"
         answer = (
-            f"You have {budget['remaining']} of {budget['total']} approach points left. "
-            "Use them on conversations you care about most."
+            f"Here’s a quick read on {company}: {summary.get('summary')} "
+            f"Their first-90-days focus is {summary.get('problem_90_days')}. "
+            "Open the brief if you want to ask — your call."
         )
-    elif "queue" in text or "wait" in text:
-        if cards:
-            brief = db.get(Brief, cards[0]["brief_id"])
-            est = get_queue_estimate(db, brief) if brief else {"est_minutes": 0}
-            answer = (
-                f"For {cards[0].get('company_name')}, estimated wait is about "
-                f"{est.get('est_minutes', 0)} minutes based on accepted conversations and tables."
-            )
-            sources = [cards[0]["brief_id"]]
-        else:
-            answer = "I do not have queue data yet because there are no suggested conversations."
-            sources = []
-    elif "next" in text or "who" in text or "talk" in text or "suggest" in text:
-        if not cards:
-            answer = (
-                "I do not have suggestions yet. Approve a skill story first, "
-                "or browse all briefs — nothing is hidden."
-            )
-            sources = []
-        else:
-            top = cards[0]
-            answer = (
-                f"A strong next conversation is {top.get('company_name')} "
-                f"({top.get('bucket')}). Reason: {top['reasons'][0]['text'] if top.get('reasons') else 'skill overlap'}. "
-                "You decide whether to ask."
-            )
-            sources = [top["brief_id"]]
-            cards = cards[:3]
+        shown = [mentioned]
+        sources = [mentioned["brief_id"]]
     else:
-        # Try to match a mentioned company name from tool results only
-        mentioned = next(
-            (c for c in cards if c.get("company_name") and c["company_name"].lower() in text),
-            None,
+        history = [t.model_dump() for t in body.history]
+        llm = await llm_copilot_answer(
+            question,
+            cards=cards,
+            budget=budget,
+            history=history,
         )
-        if mentioned:
-            summary = get_brief_summary(db, mentioned["brief_id"])
-            answer = (
-                f"{summary['company']}: {summary['summary']} "
-                f"First 90 days: {summary['problem_90_days']}"
-            )
-            sources = [mentioned["brief_id"]]
-            cards = [mentioned]
-        elif cards:
-            answer = (
-                f"Based on your approved skill story, start with {cards[0].get('company_name')}. "
-                "Open Why? to see the evidence. I never rank people or decide for you."
-            )
-            sources = [cards[0]["brief_id"]]
-            cards = cards[:2]
+        if llm:
+            answer, shown, sources = llm
         else:
-            answer = "I can only use your suggestions and brief summaries — no invented companies."
-            sources = []
-            cards = []
+            answer, shown, sources = rule_based_answer(
+                question,
+                cards=cards,
+                budget=budget,
+                queue_minutes=queue_minutes,
+            )
 
     write_audit(
         db,
@@ -106,7 +96,7 @@ def copilot_ask(
         payload={"sources": sources},
     )
     db.commit()
-    return {"answer": answer, "cards": cards, "sources": sources}
+    return {"answer": answer, "cards": shown, "sources": sources}
 
 
 @router.get("/briefing")

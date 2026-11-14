@@ -3,34 +3,17 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-import { SuggestionCard } from "@/components/match/SuggestionCard";
-import { AppShell } from "@/components/shared/AppShell";
-import { VoiceRecorder } from "@/components/voice/VoiceRecorder";
+import { CopilotChat } from "@/components/copilot/CopilotChat";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { apiFetch, getPersonaId, setPersonaId } from "@/lib/api";
-import type { Suggestion } from "@/lib/types";
 
 export default function CopilotPage() {
-  const [text, setText] = useState("");
-  const [answer, setAnswer] = useState<string | null>(null);
-  const [cards, setCards] = useState<Suggestion[]>([]);
   const [briefId, setBriefId] = useState("");
   const [briefing, setBriefing] = useState<{ questions: string[]; notes: string } | null>(null);
 
   useEffect(() => {
     setPersonaId(getPersonaId() ?? "seeker_demo_a");
   }, []);
-
-  const ask = useMutation({
-    mutationFn: (q: string) =>
-      apiFetch<{ answer: string; cards: Suggestion[] }>("/api/copilot/ask", {
-        method: "POST",
-        body: JSON.stringify({ text: q }),
-      }),
-    onSuccess: (data) => {
-      setAnswer(data.answer);
-      setCards(data.cards ?? []);
-    },
-  });
 
   const briefMe = useMutation({
     mutationFn: (id: number) =>
@@ -39,72 +22,50 @@ export default function CopilotPage() {
   });
 
   return (
-    <AppShell
+    <DashboardShell
       role="seeker"
-      title="Event Copilot"
-      subtitle="Private to you. Suggestions only — you decide."
+      title="Event copilot"
+      subtitle="A private chat about this event. Suggestions only — you decide."
     >
-      <VoiceRecorder onTranscript={(t) => ask.mutate(t)} />
-      <div className="mt-3 flex gap-2">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="min-w-0 flex-1 rounded-xl border border-signal-line px-3 py-2 text-sm"
-          placeholder="Who should I talk to next?"
-        />
-        <button
-          type="button"
-          className="rounded-xl bg-signal-accent px-4 py-2 text-sm font-semibold text-white"
-          onClick={() => text.trim() && ask.mutate(text.trim())}
-        >
-          Ask
-        </button>
-      </div>
+      <div className="mx-auto grid w-full max-w-3xl gap-4">
+        <CopilotChat variant="full" />
 
-      {answer ? (
-        <div className="mt-6 rounded-2xl border border-signal-line bg-white/80 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-signal-accent">
-            AI-assisted, you decide
+        <section className="rounded-[22px] border border-signal-line/80 bg-white/90 p-4 shadow-soft sm:p-5">
+          <h2 className="text-sm font-bold text-signal-ink">Brief me before a chat</h2>
+          <p className="mt-1 text-sm text-signal-muted">
+            Optional prep notes for a specific company brief — still your call whether to ask.
           </p>
-          <p className="mt-2 text-signal-ink">{answer}</p>
-        </div>
-      ) : null}
-
-      <div className="mt-4 grid gap-3">
-        {cards.map((c) => (
-          <SuggestionCard key={c.brief_id} suggestion={c} onWhy={() => undefined} />
-        ))}
-      </div>
-
-      <div className="mt-8 rounded-2xl border border-signal-line bg-white/70 p-4">
-        <h2 className="font-display text-xl">Brief me</h2>
-        <p className="mt-1 text-sm text-signal-ink/60">Enter a brief id before a conversation.</p>
-        <div className="mt-3 flex gap-2">
-          <input
-            value={briefId}
-            onChange={(e) => setBriefId(e.target.value)}
-            className="w-28 rounded-xl border border-signal-line px-3 py-2 text-sm"
-            placeholder="Brief id"
-          />
-          <button
-            type="button"
-            className="rounded-xl border border-signal-line px-4 py-2 text-sm font-semibold"
-            onClick={() => briefMe.mutate(Number(briefId))}
-          >
-            Brief me
-          </button>
-        </div>
-        {briefing ? (
-          <div className="mt-3 text-sm">
-            <p>{briefing.notes}</p>
-            <ul className="mt-2 list-disc pl-5">
-              {briefing.questions.map((q) => (
-                <li key={q}>{q}</li>
-              ))}
-            </ul>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <input
+              value={briefId}
+              onChange={(e) => setBriefId(e.target.value)}
+              className="w-32 rounded-xl border border-signal-line px-3 py-2 text-sm"
+              placeholder="Brief id"
+              aria-label="Brief id"
+            />
+            <button
+              type="button"
+              className="rounded-xl border border-signal-line bg-signal-foam px-4 py-2 text-sm font-semibold text-signal-ink hover:bg-white"
+              onClick={() => {
+                const id = Number(briefId);
+                if (Number.isFinite(id) && id > 0) briefMe.mutate(id);
+              }}
+            >
+              Brief me
+            </button>
           </div>
-        ) : null}
+          {briefing ? (
+            <div className="mt-3 rounded-2xl bg-signal-foam/70 px-3 py-3 text-sm text-signal-ink">
+              <p>{briefing.notes}</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-signal-muted">
+                {briefing.questions.map((q) => (
+                  <li key={q}>{q}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </section>
       </div>
-    </AppShell>
+    </DashboardShell>
   );
 }

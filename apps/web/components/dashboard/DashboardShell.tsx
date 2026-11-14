@@ -55,10 +55,8 @@ export function DashboardShell({
   return (
     <div
       className={cn(
-        "dash-bg relative flex overflow-x-hidden",
-        // Desktop: lock to viewport when requested. Mobile: natural page height + scroll.
-        fitViewport ? "md:h-dvh md:max-h-dvh md:overflow-hidden" : "min-h-dvh",
-        "min-h-dvh",
+        "dash-bg relative flex w-full max-w-[100vw] overflow-x-hidden",
+        fitViewport ? "h-dvh max-h-dvh overflow-hidden" : "min-h-dvh",
       )}
       data-theme={theme}
     >
@@ -68,14 +66,18 @@ export function DashboardShell({
       </div>
       <div
         className={cn(
-          "relative z-10 flex min-h-0 min-w-0 flex-1 flex-col",
-          fitViewport ? "md:overflow-hidden" : "md:overflow-y-auto",
+          "relative z-10 flex min-h-0 min-w-0 max-w-full flex-1 flex-col overflow-x-hidden",
+          fitViewport ? "overflow-hidden" : "md:overflow-y-auto",
         )}
       >
         <header
           className={cn(
-            "flex shrink-0 flex-col gap-3 px-4 sm:px-6 lg:px-10",
-            fitViewport ? "pb-1 pt-3 sm:pt-5" : "pb-2 pt-4 sm:pt-8",
+            "flex shrink-0 flex-col px-4 sm:px-6 lg:px-10",
+            hideHeading && fitViewport
+              ? "gap-0 py-2 md:py-3"
+              : fitViewport
+                ? "gap-3 pb-1 pt-3 sm:pt-5"
+                : "gap-3 pb-2 pt-4 sm:pt-8",
           )}
         >
           <MobileTopBar role={role} onOpenMenu={() => setMenuOpen(true)} />
@@ -133,26 +135,26 @@ export function DashboardShell({
         <main
           id="main"
           className={cn(
-            "relative flex-1 px-4 sm:px-6 lg:px-10",
+            "relative min-w-0 max-w-full flex-1 overflow-x-hidden px-4 sm:px-6 lg:px-10",
             // Room for fixed bottom nav + safe area on phones
-            "pb-[calc(5.25rem+env(safe-area-inset-bottom))] md:pb-6",
-            fitViewport
-              ? "flex min-h-0 flex-col py-3 md:overflow-hidden"
-              : "py-4 sm:py-6",
+            "pb-[calc(5.25rem+env(safe-area-inset-bottom))] md:pb-4",
+            fitViewport ? "flex min-h-0 flex-col overflow-hidden py-2" : "py-4 sm:py-6",
           )}
         >
           {children}
         </main>
 
-        <div className="hidden md:block">
-          <FooterNote compact={fitViewport}>
-            {seeker
-              ? "Your words. Your evidence. You choose who hears it."
-              : organiser
-                ? "Aggregates only. Humans decide how to close the gaps."
-                : "AI helps people explain themselves. Humans decide who to talk to."}
-          </FooterNote>
-        </div>
+        {!fitViewport ? (
+          <div className="hidden md:block">
+            <FooterNote>
+              {seeker
+                ? "Your words. Your evidence. You choose who hears it."
+                : organiser
+                  ? "Aggregates only. Humans decide how to close the gaps."
+                  : "AI helps people explain themselves. Humans decide who to talk to."}
+            </FooterNote>
+          </div>
+        ) : null}
       </div>
 
       <MobileBottomNav role={role} />

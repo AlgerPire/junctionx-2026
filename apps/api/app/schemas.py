@@ -60,6 +60,12 @@ class Suggestion(BaseModel):
     fit_summary: str | None = None
     gaps_summary: str | None = None
     overview: str | None = None
+    # Transparent skill overlap vs must-haves (0–100). Explainability aid — not a hiring score.
+    skill_overlap_pct: int | None = None
+    must_have_total: int | None = None
+    must_have_covered: int | None = None
+    # Existing approach from this seeker to this brief, if any.
+    approach_status: str | None = None
 
 
 class PersonaOut(BaseModel):
@@ -225,3 +231,5 @@ class SupplyGapRow(BaseModel):
     supply: float
     gap: float
     suppressed: bool = False
+
+

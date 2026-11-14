@@ -11,6 +11,7 @@ from app.deps import (
     to_brief_view,
     to_seeker_skill_view,
 )
+from app.models import Approach
 from app.schemas import BriefOut, BriefSkillOut, LanguageLevel, Suggestion, SuggestionsResponse
 from app.services.audit import write_audit
 from app.services.candidate_pool import load_brief, suggested_candidates
@@ -39,6 +40,13 @@ def suggestions_for_seeker(
         briefs = [b for b in briefs if b.event_id == event_id]
     eid = event_id or (briefs[0].event_id if briefs else 0)
 
+    existing = {
+        a.brief_id: a.status
+        for a in db.scalars(
+            select(Approach).where(Approach.seeker_id == seeker.id)
+        ).all()
+    }
+
     scored: list[tuple[Suggestion, float]] = []
     for brief in briefs:
         sug, coverage = match(view, to_brief_view(brief), skill_index.sim, event_id=eid)
@@ -46,6 +54,7 @@ def suggestions_for_seeker(
             continue
         sug.company_name = brief.company.name
         sug.brief_summary = brief.plain_summary
+        sug.approach_status = existing.get(brief.id)
         attach_overview(sug, coverage, perspective="seeker")
         scored.append((sug, coverage))
 

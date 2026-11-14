@@ -35,6 +35,11 @@ export interface Suggestion {
   fit_summary?: string | null;
   gaps_summary?: string | null;
   overview?: string | null;
+  /** Skill overlap vs must-haves (0–100). Not a hiring score. */
+  skill_overlap_pct?: number | null;
+  must_have_total?: number | null;
+  must_have_covered?: number | null;
+  approach_status?: string | null;
 }
 
 export interface SuggestionsResponse {
