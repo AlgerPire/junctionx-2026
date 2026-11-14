@@ -37,7 +37,7 @@ export default function TransparencyPage() {
     <AppShell title="Transparency">
       <div className="grid gap-6 md:grid-cols-2">
         <section className="rounded-2xl border border-signal-line/80 bg-white/80 p-5">
-          <h2 className="font-display text-xl">What First: Skill! uses</h2>
+          <h2 className="font-display text-xl">What Skills First! uses</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-signal-ink/80">
             <li>Approved skill stories with evidence quotes</li>
             <li>Company-stated language requirements</li>
@@ -46,7 +46,7 @@ export default function TransparencyPage() {
           </ul>
         </section>
         <section className="rounded-2xl border border-signal-line/80 bg-white/80 p-5">
-          <h2 className="font-display text-xl">What First: Skill! never uses</h2>
+          <h2 className="font-display text-xl">What Skills First! never uses</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-signal-ink/80">
             <li>Name, photo, age, gender</li>
             <li>Nationality or origin</li>
@@ -57,7 +57,7 @@ export default function TransparencyPage() {
       </div>
 
       <p className="mt-4 text-sm text-signal-muted">
-        Using First: Skill! never affects access to public employment services or benefits.{" "}
+        Using Skills First! never affects access to public employment services or benefits.{" "}
         <Link href="/accessibility" className="font-semibold text-signal-accent">
           Accessibility statement
         </Link>

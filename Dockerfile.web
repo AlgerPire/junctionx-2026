@@ -1,5 +1,5 @@
 # Build from repo root:
-# docker build -f Dockerfile.web --build-arg NEXT_PUBLIC_API_URL=https://api.example.com -t first-skill-web .
+# docker build -f Dockerfile.web --build-arg NEXT_PUBLIC_API_URL=https://api.example.com -t skills-first-web .
 FROM node:20-alpine AS deps
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9.14.2 --activate

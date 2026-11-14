@@ -145,7 +145,7 @@ export function OnboardingFlow({
                   ? "Saving…"
                   : seeker
                     ? "Continue to skill story"
-                    : "Start using First: Skill!"}
+                    : "Start using Skills First!"}
                 <Check className="h-4 w-4" />
               </button>
             ) : (

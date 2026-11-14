@@ -38,7 +38,7 @@ export default function FollowupsPage() {
   return (
     <AppShell title="Follow-ups">
       <p className="mb-4 text-sm text-signal-ink/70">
-        After a conversation, leave a 15-second note. First: Skill! structures next steps — you stay in control.
+        After a conversation, leave a 15-second note. Skills First! structures next steps — you stay in control.
       </p>
       <label className="text-sm">
         Approach id{" "}

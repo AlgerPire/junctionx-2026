@@ -80,7 +80,7 @@ def request_magic_link(body: RequestLinkIn, db: Session = Depends(get_db)) -> di
 
     verify_url = f"{settings.app_public_url.rstrip('/')}/auth/verify?token={raw}"
     logger.info("Magic link for %s (%s): %s", email, role, verify_url)
-    print(f"[First: Skill!] Magic link for {email}: {verify_url}", flush=True)
+    print(f"[Skills First!] Magic link for {email}: {verify_url}", flush=True)
 
     out: dict = {
         "ok": True,

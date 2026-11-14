@@ -55,7 +55,7 @@ export default function OrganiserDashboardPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "first-skill-supply-gap.csv";
+    a.download = "skills-first-supply-gap.csv";
     a.click();
     URL.revokeObjectURL(url);
   }

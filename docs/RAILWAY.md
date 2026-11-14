@@ -1,4 +1,4 @@
-# Deploy First: Skill! on Railway (via GitHub)
+# Deploy Skills First! on Railway (via GitHub)
 
 ## Architecture
 
@@ -72,8 +72,8 @@ In Railway web service → Variables, also add under **Build** variables if offe
 
 ```bash
 docker compose up -d db
-docker build -f Dockerfile.api -t first-skill-api .
-docker run --rm -p 8000:8000 --env-file .env -e DATABASE_URL=postgresql+psycopg://signal:signal@host.docker.internal:5437/signal -e SEED_ON_STARTUP=1 first-skill-api
+docker build -f Dockerfile.api -t skills-first-api .
+docker run --rm -p 8000:8000 --env-file .env -e DATABASE_URL=postgresql+psycopg://signal:signal@host.docker.internal:5437/signal -e SEED_ON_STARTUP=1 skills-first-api
 ```
 
 ## Notes

@@ -1,4 +1,4 @@
-# Build from repo root: docker build -f Dockerfile.api -t first-skill-api .
+# Build from repo root: docker build -f Dockerfile.api -t skills-first-api .
 FROM python:3.12-slim
 
 WORKDIR /app

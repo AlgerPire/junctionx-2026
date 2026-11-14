@@ -19,7 +19,7 @@ NOTICE = {
     "en": {
         "title": "Privacy notice (pilot)",
         "summary": (
-            "First: Skill! helps you explain your skills and meet companies at Espoo events. "
+            "Skills First! helps you explain your skills and meet companies at Espoo events. "
             "Using this service never affects your access to public employment services or benefits."
         ),
         "points": [
@@ -37,7 +37,7 @@ NOTICE = {
     "fi": {
         "title": "Tietosuojailmoitus (pilotti)",
         "summary": (
-            "First: Skill! auttaa sinua kertomaan osaamisestasi ja tapaamaan yrityksiä Espoon tapahtumissa. "
+            "Skills First! auttaa sinua kertomaan osaamisestasi ja tapaamaan yrityksiä Espoon tapahtumissa. "
             "Palvelun käyttö ei vaikuta oikeuteesi julkisiin työllisyyspalveluihin tai etuuksiin."
         ),
         "points": [
@@ -55,7 +55,7 @@ NOTICE = {
     "sv": {
         "title": "Integritetsmeddelande (pilot)",
         "summary": (
-            "First: Skill! hjälper dig beskriva dina färdigheter och träffa företag på Esbo-evenemang. "
+            "Skills First! hjälper dig beskriva dina färdigheter och träffa företag på Esbo-evenemang. "
             "Att använda tjänsten påverkar aldrig din tillgång till offentliga arbetsmarknadstjänster eller förmåner."
         ),
         "points": [

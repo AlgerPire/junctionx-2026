@@ -41,7 +41,7 @@ export default function NewBriefPage() {
     <AppShell
       role="company"
       title="New hiring brief"
-      subtitle="Talk through the role. First: Skill! clarifies gaps. You list the job."
+      subtitle="Talk through the role. Skills First! clarifies gaps. You list the job."
     >
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4">

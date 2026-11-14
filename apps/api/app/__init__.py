@@ -1,1 +1,1 @@
-"""First: Skill! API package."""
+"""Skills First! API package."""

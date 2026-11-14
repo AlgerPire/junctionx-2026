@@ -7,7 +7,7 @@ export interface OnboardingStep {
 export const SEEKER_ONBOARDING: OnboardingStep[] = [
   {
     title: "Welcome — you stay in control",
-    body: "First: Skill! helps you explain what you can do in your own words, then suggests conversations at Espoo events. Nothing is shared with companies until you approve it.",
+    body: "Skills First! helps you explain what you can do in your own words, then suggests conversations at Espoo events. Nothing is shared with companies until you approve it.",
     tip: "Using this service never affects your public employment services or benefits.",
   },
   {
@@ -30,7 +30,7 @@ export const SEEKER_ONBOARDING: OnboardingStep[] = [
 export const COMPANY_ONBOARDING: OnboardingStep[] = [
   {
     title: "Welcome — humans decide",
-    body: "First: Skill! helps your team describe a hiring need in about ten minutes, then receive conversation requests from people with evidenced skills.",
+    body: "Skills First! helps your team describe a hiring need in about ten minutes, then receive conversation requests from people with evidenced skills.",
     tip: "No automated rejection. No hiring score. Your recruiters choose whom to meet.",
   },
   {
